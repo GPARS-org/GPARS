@@ -1,0 +1,29 @@
+{
+  "id": "org:example/agent:research-assistant-v1",
+  "version": "0.1.0",
+  "required_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/browser",
+      "version": ">=1.0.0",
+      "permission_scopes": ["navigate", "read"]
+    },
+    {
+      "server_id": "registry.openmcp.org/filesystem",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ],
+  "optional_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/database",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ],
+  "extensions": {
+    "org.example.research": {
+      "max_search_depth": 3,
+      "preferred_sources": ["arxiv", "scholar"]
+    }
+  }
+}

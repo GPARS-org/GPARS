@@ -1,0 +1,84 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.org/gpars/agent-capability-manifest.schema.json",
+    "title": "GPARS Agent Capability Manifest",
+    "description": "Machine-readable declaration of required MCP servers and permissions for a general-purpose agent.",
+    "type": "object",
+    "required": [
+        "id",
+        "required_mcp_servers"
+    ],
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "Unique identifier for the agent within its operational domain."
+        },
+        "version": {
+            "type": "string",
+            "description": "Semantic version of the agent.",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "required_mcp_servers": {
+            "type": "array",
+            "description": "List of MCP servers required for the agent to function as intended.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "server_id",
+                    "version",
+                    "permission_scopes"
+                ],
+                "properties": {
+                    "server_id": {
+                        "type": "string",
+                        "description": "Canonical identifier from an official MCP registry."
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Semantic version constraint for the server (e.g., >=1.0.0)."
+                    },
+                    "permission_scopes": {
+                        "type": "array",
+                        "description": "List of permission scopes required for this server. Scopes are server-defined and opaque to GPARS.",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "optional_mcp_servers": {
+            "type": "array",
+            "description": "Optional MCP servers that enhance agent capabilities. The agent may operate without them.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "server_id"
+                ],
+                "properties": {
+                    "server_id": {
+                        "type": "string",
+                        "description": "Canonical identifier from an official MCP registry."
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Semantic version constraint for the server (e.g., >=1.0.0)."
+                    },
+                    "permission_scopes": {
+                        "type": "array",
+                        "description": "List of permission scopes required for this server.",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "extensions": {
+            "type": "object",
+            "description": "Optional extension metadata. Keys SHOULD use reverse-domain notation to avoid collisions.",
+            "additionalProperties": true
+        }
+    },
+    "additionalProperties": false
+}
