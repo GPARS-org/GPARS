@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://example.org/gpars/agent-capability-manifest.schema.json",
+    "$id": "https://raw.githubusercontent.com/GPARS-org/GPARS/main/spec/v0.1/agent_capability_manifest_schema.json",
     "title": "GPARS Agent Capability Manifest",
     "description": "Machine-readable declaration of required MCP servers and permissions for a general-purpose agent.",
     "type": "object",
@@ -44,7 +44,8 @@
                             "type": "string"
                         }
                     }
-                }
+                },
+                "additionalProperties": false
             }
         },
         "optional_mcp_servers": {
@@ -71,7 +72,8 @@
                             "type": "string"
                         }
                     }
-                }
+                },
+                "additionalProperties": false
             }
         },
         "extensions": {

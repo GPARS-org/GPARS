@@ -44,7 +44,10 @@ An agent is general-purpose when its capabilities are not limited by what is emb
 14. [Rationale](#14-rationale)
 15. [Non-Goals (v0.1)](#15-non-goals-v01)
 16. [References](#16-references)
-- [Appendix A: Worked Example](#appendix-a-worked-example)
+
+**Appendices**
+
+- [Appendix A: Worked Example](#appendix-a-worked-example-non-normative)
 
 ---
 
@@ -70,7 +73,7 @@ GPARS v0.1 standardizes:
 - A reference architecture defining the boundary between cognition and action.
 - A user-controlled enforcement point at the plane boundary.
 - A security policy model where the user controls agent authorization.
-- A standard authorization denial error at the MCP level.
+- Standard error codes at the MCP level.
 - Enforcement expectations during agent operation.
 
 GPARS v0.1 does NOT standardize:
@@ -126,18 +129,13 @@ GPARS defines two planes separated by a hard boundary. The Cognitive Plane is wh
                         │
                         │ MCP requests
                         │
-        ========================================        
+        ════════════════╪═══════════════════════        
                      Plane Boundary             
-           (user-controlled enforcement point)  
-        ========================================
+           (user-controlled enforcement point)
+           identity verification · policy eval
+        ════════════════╪═══════════════════════
 ┌─────────────────────────────────────────────────────┐
 │          Action Plane (owned by user)               │
-│                                                     │
-│  ┌──────────────────────────────────────────────┐   │
-│  │     Security Policy (per-agent, per-server)   │  │
-│  │     identity verification · authorization    │   │
-│  │     audit logging · scope enforcement        │   │
-│  └──────────────────────────────────────────────┘   │
 │                                                     │
 │  ┌─────────┐  ┌────────────┐  ┌───────────────┐     │
 │  │  bash   │  │ filesystem │  │   database    │     │
@@ -183,13 +181,12 @@ The Action Plane contains:
 - **Infrastructure** — OS, network, hardware, storage that MCP servers operate on.
 
 MCP Servers:
-- MUST enforce the user's security policy on every operation.
-- MUST return a standard error when an operation violates policy or the server is unavailable (see [Section 8.3](#83-standard-errors)).
-- MUST NOT be required to interpret GPARS manifests.
+- MUST NOT be required to interpret GPARS manifests or security policies.
 - MUST return structured result objects.
 - SHOULD provide deterministic execution boundaries.
+- MAY enforce their own operational constraints (e.g., resource limits, path restrictions inherent to the server's configuration).
 
-Servers are reusable across agents and do not need awareness of GPARS. They interact with underlying infrastructure on behalf of the agent — the agent never interacts with infrastructure directly.
+Servers are reusable across agents and do not need awareness of GPARS. GPARS security policy is enforced at the plane boundary enforcement point, not by MCP servers. Servers interact with underlying infrastructure on behalf of the agent — the agent never interacts with infrastructure directly.
 
 ### 5.3 Plane Boundary
 
@@ -197,8 +194,10 @@ The boundary between the Cognitive Plane and the Action Plane MUST be enforced b
 
 The enforcement point is responsible for:
 - Verifying the identity of the requesting agent (so that per-agent security policy can be applied).
-- Routing MCP requests to the appropriate MCP servers.
-- Ensuring the agent cannot bypass the security policy.
+- Evaluating each MCP request against the user's security policy.
+- Returning `AUTHORIZATION_DENIED` for operations that violate the policy.
+- Returning `SERVER_UNAVAILABLE` when a target MCP server is not reachable.
+- Routing permitted requests to the appropriate MCP servers.
 
 GPARS does not mandate a specific implementation for the enforcement point. Implementers MAY use a reverse proxy, network isolation, Unix socket permissions, process-level sandboxing, or any other mechanism that ensures the Cognitive Plane cannot directly access MCP servers while bypassing the security policy.
 
@@ -319,7 +318,7 @@ The **user** is the policy authority. The user owns the Action Plane — its dat
 The security policy:
 - MUST be defined by the user (or by a policy management engine acting on the user's behalf).
 - MUST be bound to the agent's verified identity as determined by the plane boundary enforcement point (see [Section 5.3](#53-plane-boundary)) — NOT by the agent's self-declared `id` field.
-- MUST be enforced at the Action Plane boundary and by MCP servers, not by the agent itself.
+- MUST be enforced at the Action Plane boundary (the enforcement point), not by the agent itself.
 - MAY support a default policy that applies when no agent-specific policy is defined.
 
 The agent does not participate in defining, negotiating, or interpreting the security policy. The agent is a subject of the policy, not an author of it. The agent cannot influence how it is identified to the Action Plane.
@@ -339,12 +338,14 @@ GPARS defines the following standard MCP-level error codes:
 
 | Code | Meaning | Returned by |
 |------|---------|-------------|
-| `AUTHORIZATION_DENIED` | The operation violates the user's security policy. | Enforcement point or MCP server |
+| `AUTHORIZATION_DENIED` | The operation violates the user's security policy. | Enforcement point |
 | `SERVER_UNAVAILABLE` | The target MCP server is not reachable. | Enforcement point |
 
-All standard errors MUST include:
-- `code` — one of the standard error codes above.
-- `message` — a human-readable description.
+GPARS errors are returned within the MCP JSON-RPC 2.0 error envelope. The GPARS error code is carried in the `data` field:
+
+- `error.code` — a JSON-RPC error code (GPARS uses `-32001` for policy errors and `-32002` for availability errors).
+- `error.message` — a human-readable description.
+- `error.data.gpars_code` — the GPARS standard error code.
 
 Errors SHOULD NOT include:
 - The full security policy or its rules.
@@ -354,9 +355,14 @@ Errors SHOULD NOT include:
 
 ```json
 {
+  "jsonrpc": "2.0",
+  "id": 1,
   "error": {
-    "code": "AUTHORIZATION_DENIED",
-    "message": "Write access to /etc/passwd is not permitted for this agent."
+    "code": -32001,
+    "message": "Write access to /etc/passwd is not permitted for this agent.",
+    "data": {
+      "gpars_code": "AUTHORIZATION_DENIED"
+    }
   }
 }
 ```
@@ -365,9 +371,14 @@ Errors SHOULD NOT include:
 
 ```json
 {
+  "jsonrpc": "2.0",
+  "id": 2,
   "error": {
-    "code": "SERVER_UNAVAILABLE",
-    "message": "MCP server 'registry.openmcp.org/bash' is not reachable."
+    "code": -32002,
+    "message": "MCP server 'registry.openmcp.org/bash' is not reachable.",
+    "data": {
+      "gpars_code": "SERVER_UNAVAILABLE"
+    }
   }
 }
 ```
@@ -386,9 +397,10 @@ The agent MAY retry after receiving `SERVER_UNAVAILABLE`, as the server may beco
 4. When the agent issues an MCP request, it passes through the plane boundary enforcement point.
 5. The enforcement point verifies the agent's identity using infrastructure under the user's control (not by trusting the manifest's `id` field).
 6. The enforcement point evaluates the request against the user's security policy. Operations that violate the policy are denied with `AUTHORIZATION_DENIED`.
-7. If the target MCP server is unavailable, the agent receives a `SERVER_UNAVAILABLE` error. The agent MAY retry, wait, or adapt its approach.
+7. If the target MCP server is unavailable, the enforcement point returns `SERVER_UNAVAILABLE`. The agent MAY retry, wait, or adapt its approach.
+8. If the request is permitted and the server is available, the enforcement point forwards the request. The MCP server processes it and returns a result or an operational error (e.g., invalid parameters, resource not found).
 
-The manifest is a declarative statement of what the agent needs — not an activation gate. Manifest interpretation occurs once, at the Agent Runtime (Cognitive Plane). Policy enforcement and availability are discovered at operation time, at the Action Plane boundary.
+The manifest is a declarative statement of what the agent needs — not an activation gate. Manifest interpretation occurs once, at the Agent Runtime (Cognitive Plane). Policy enforcement and availability are discovered at operation time, at the Action Plane boundary. MCP servers handle operational concerns; the enforcement point handles security concerns.
 
 ---
 
@@ -404,8 +416,8 @@ The manifest and the security policy serve different roles:
 The manifest declares what the agent needs. The security policy determines what the agent is allowed to do. These are independent — an agent may declare a requirement for `filesystem: ["read", "write"]` but the user's policy may only permit `read` on specific paths.
 
 Enforcement points:
-- **Boundary** — the plane boundary enforcement point verifies agent identity and routes MCP requests. The agent cannot bypass this point.
-- **Operation** — MCP servers enforce the user's security policy on every request. Unauthorized operations receive `AUTHORIZATION_DENIED`. Unavailable servers return `SERVER_UNAVAILABLE`.
+- **Boundary** — the plane boundary enforcement point verifies agent identity, evaluates requests against the security policy, and routes permitted requests to MCP servers. The agent cannot bypass this point. Unauthorized operations receive `AUTHORIZATION_DENIED`. Unavailable servers return `SERVER_UNAVAILABLE`.
+- **Operation** — MCP servers may enforce their own operational constraints (e.g., resource limits, invalid parameters) and return standard MCP errors. MCP servers are NOT required to implement GPARS security policy logic.
 
 The agent is never trusted to enforce its own boundaries or assert its own identity. All enforcement occurs outside the Cognitive Plane, under the user's control.
 
@@ -413,10 +425,19 @@ The agent is never trusted to enforce its own boundaries or assert its own ident
 
 ## 11. Compliance Levels
 
+**Cognitive Plane (Agent) compliance:**
+
 | Level | Criteria |
 |-------|----------|
 | **Compliant** | Agent fully externalizes all EMOs via MCP and publishes a valid capability manifest. |
 | **Non-Compliant** | Agent performs EMOs internally or does not declare required MCP servers. |
+
+**Action Plane (Infrastructure) compliance:**
+
+| Level | Criteria |
+|-------|----------|
+| **Compliant** | A user-controlled enforcement point is present, verifies agent identity, enforces security policy, and returns GPARS standard errors (`AUTHORIZATION_DENIED`, `SERVER_UNAVAILABLE`). |
+| **Non-Compliant** | MCP servers accept requests directly from agents without an enforcement point, or the enforcement point does not return GPARS standard errors. |
 
 Partial or transitional compliance levels are not defined in v0.1 and are reserved for future revision.
 
@@ -427,7 +448,7 @@ Partial or transitional compliance levels are not defined in v0.1 and are reserv
 - By externalizing EMOs, agents avoid executing untrusted or privileged actions internally.
 - The user's security policy is the sole authorization authority. Agents cannot self-authorize.
 - Agent identity is verified by infrastructure under the user's control at the plane boundary — agents cannot self-assert their identity to the Action Plane.
-- MCP servers act as the enforcement layer, applying policy on every operation.
+- The enforcement point applies security policy on every operation before it reaches MCP servers.
 - Every EMO crosses the MCP boundary, creating a natural audit surface for all agent actions.
 - Authorization denials are standard and structured, enabling agents to handle them gracefully without leaking policy details.
 - The standard does NOT specify enforcement point implementations; implementers MAY use reverse proxies, network isolation, Unix socket permissions, containers, runtime sandboxes, or OS-level isolation.
@@ -566,14 +587,19 @@ The agent attempts to write to a protected path:
 }
 ```
 
-The user's security policy denies write access to `/etc/`. The MCP server returns:
+The user's security policy denies write access to `/etc/`. The enforcement point returns:
 
 **Response:**
 ```json
 {
+  "jsonrpc": "2.0",
+  "id": 2,
   "error": {
-    "code": "AUTHORIZATION_DENIED",
-    "message": "Write access to /etc/passwd is not permitted for this agent."
+    "code": -32001,
+    "message": "Write access to /etc/passwd is not permitted for this agent.",
+    "data": {
+      "gpars_code": "AUTHORIZATION_DENIED"
+    }
   }
 }
 ```
@@ -599,9 +625,14 @@ The enforcement point cannot reach the git server and returns:
 **Response:**
 ```json
 {
+  "jsonrpc": "2.0",
+  "id": 3,
   "error": {
-    "code": "SERVER_UNAVAILABLE",
-    "message": "MCP server 'registry.openmcp.org/git' is not reachable."
+    "code": -32002,
+    "message": "MCP server 'registry.openmcp.org/git' is not reachable.",
+    "data": {
+      "gpars_code": "SERVER_UNAVAILABLE"
+    }
   }
 }
 ```
