@@ -15,35 +15,36 @@ An agent is general-purpose when its capabilities are not limited by what is emb
 ## Table of Contents
 
 1. [Introduction](#1-introduction)
-2. [Scope](#2-scope)
-3. [Conformance Language](#3-conformance-language)
-4. [Terminology](#4-terminology)
-5. [Architecture](#5-architecture)
-   - 5.1 [Cognitive Plane](#51-cognitive-plane)
-   - 5.2 [Action Plane](#52-action-plane)
-   - 5.3 [Plane Boundary](#53-plane-boundary)
-6. [Environment-Modifying Operations](#6-environment-modifying-operations)
-   - 6.1 [EMO Rules](#61-emo-rules)
-   - 6.2 [EMO Classification](#62-emo-classification)
-   - 6.3 [Edge Cases](#63-edge-cases)
-7. [Agent Manifest](#7-agent-manifest)
-   - 7.1 [Manifest Structure](#71-manifest-structure)
-   - 7.2 [Required MCP Servers](#72-required-mcp-servers)
-   - 7.3 [Optional MCP Servers](#73-optional-mcp-servers)
-   - 7.4 [Identity Field](#74-identity-field)
-   - 7.5 [Permission Scopes](#75-permission-scopes)
-8. [Security Policy](#8-security-policy)
-   - 8.1 [Policy Authority](#81-policy-authority)
-   - 8.2 [Policy Scope](#82-policy-scope)
-   - 8.3 [Standard Errors](#83-standard-errors)
-9. [Activation and Processing Model](#9-activation-and-processing-model)
-10. [Enforcement Model](#10-enforcement-model)
-11. [Compliance Levels](#11-compliance-levels)
-12. [Security Considerations](#12-security-considerations)
-13. [Extension Model](#13-extension-model)
-14. [Rationale](#14-rationale)
-15. [Non-Goals (v0.1)](#15-non-goals-v01)
-16. [References](#16-references)
+2. [Why General-Purpose?](#2-why-general-purpose)
+3. [Scope](#3-scope)
+4. [Conformance Language](#4-conformance-language)
+5. [Terminology](#5-terminology)
+6. [Architecture](#6-architecture)
+   - 6.1 [Cognitive Plane](#61-cognitive-plane)
+   - 6.2 [Action Plane](#62-action-plane)
+   - 6.3 [Plane Boundary](#63-plane-boundary)
+7. [Environment-Modifying Operations](#7-environment-modifying-operations)
+   - 7.1 [EMO Rules](#71-emo-rules)
+   - 7.2 [EMO Classification](#72-emo-classification)
+   - 7.3 [Edge Cases](#73-edge-cases)
+8. [Agent Manifest](#8-agent-manifest)
+   - 8.1 [Manifest Structure](#81-manifest-structure)
+   - 8.2 [Required MCP Servers](#82-required-mcp-servers)
+   - 8.3 [Optional MCP Servers](#83-optional-mcp-servers)
+   - 8.4 [Identity Field](#84-identity-field)
+   - 8.5 [Permission Scopes](#85-permission-scopes)
+9. [Security Policy](#9-security-policy)
+   - 9.1 [Policy Authority](#91-policy-authority)
+   - 9.2 [Policy Scope](#92-policy-scope)
+   - 9.3 [Standard Errors](#93-standard-errors)
+10. [Activation and Processing Model](#10-activation-and-processing-model)
+11. [Enforcement Model](#11-enforcement-model)
+12. [Compliance Levels](#12-compliance-levels)
+13. [Security Considerations](#13-security-considerations)
+14. [Extension Model](#14-extension-model)
+15. [Rationale](#15-rationale)
+16. [Non-Goals (v0.1)](#16-non-goals-v01)
+17. [References](#17-references)
 
 **Appendices**
 
@@ -63,7 +64,25 @@ This specification targets **MCP 2025-11-25** (latest stable revision at time of
 
 ---
 
-## 2. Scope
+## 2. Why General-Purpose?
+
+An agent that embeds its tools is limited by them. If execution capabilities are built into the agent — a hardcoded Bash tool, a built-in file reader, a baked-in HTTP client — then the agent's capability surface is fixed at development time. It can only operate in environments that match those built-in tools. Change the environment, and the agent breaks or cannot adapt. This is a special-purpose agent: capable within its designed context, brittle outside of it.
+
+A general-purpose agent has no intrinsic capabilities beyond cognition. It does not embed tools that touch the environment. Instead, it declares what it needs (via a manifest) and composes capabilities from external MCP servers provided by the environment. The same cognitive core can operate as a coding assistant in one environment, a research agent in another, and a system administrator in a third — depending entirely on which MCP servers are available.
+
+This is the architectural consequence of the Cognitive Plane / Action Plane separation:
+
+- **Embedded tools lock the agent to a fixed capability surface.** The agent can only do what was built into it. Adding capabilities requires modifying the agent itself.
+- **Externalized tools via MCP make the capability surface composable.** The agent can operate across any environment that provides MCP servers matching its declared requirements. Adding capabilities means adding MCP servers — the agent doesn't change.
+- **Specialization comes from the agent loop, not from embedded tools.** Two agents using identical MCP servers can behave entirely differently based on their system prompts, skills, reasoning architecture, and goals. The tools don't define the agent — the cognition does.
+
+This is what "general-purpose" means in GPARS. The standard does not make agents smarter or more capable. It makes them portable, composable, and environment-independent by ensuring they are not architecturally bound to a fixed set of capabilities.
+
+Every normative requirement in this specification — the plane separation, the manifest, the enforcement model, the security policy — exists to support and enforce this principle.
+
+---
+
+## 3. Scope
 
 GPARS v0.1 standardizes:
 
@@ -89,13 +108,13 @@ GPARS v0.1 does NOT standardize:
 
 ---
 
-## 3. Conformance Language
+## 4. Conformance Language
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
 ---
 
-## 4. Terminology
+## 5. Terminology
 
 | Term | Definition |
 |------|------------|
@@ -111,7 +130,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ---
 
-## 5. Architecture
+## 6. Architecture
 
 GPARS defines two planes separated by a hard boundary. The Cognitive Plane is where the agent reasons. The Action Plane is where operations execute. The Action Plane is owned by the user and is the sole authority over what agents are permitted to do within it.
 
@@ -149,7 +168,7 @@ GPARS defines two planes separated by a hard boundary. The Cognitive Plane is wh
 
 The boundary between planes is the central architectural constraint of GPARS. The Cognitive Plane MUST NOT perform Environment-Modifying Operations directly. All such operations MUST cross the boundary via MCP. The user's security policy governs what the agent is permitted to do once operations reach the Action Plane.
 
-### 5.1 Cognitive Plane
+### 6.1 Cognitive Plane
 
 Contains the Agent Runtime and the Agent.
 
@@ -171,12 +190,12 @@ The Agent:
 
 The Cognitive Plane is confined to Internal Cognitive State (ICS). Everything the agent does that does not cross the MCP boundary is cognition. Everything that crosses the boundary is action. GPARS does not restrict what happens inside the Cognitive Plane — only what crosses the boundary.
 
-### 5.2 Action Plane
+### 6.2 Action Plane
 
 The Action Plane is **owned by the user**. It contains the user's data, systems, and infrastructure. The user is the authority over what agents are permitted to do within it — just as a system administrator controls what users can do on a machine.
 
 The Action Plane contains:
-- **Security Policy** — user-defined rules governing agent permissions (see [Section 8](#8-security-policy)).
+- **Security Policy** — user-defined rules governing agent permissions (see [Section 9](#9-security-policy)).
 - **MCP Servers** — capability providers that execute operations on behalf of agents.
 - **Infrastructure** — OS, network, hardware, storage that MCP servers operate on.
 
@@ -188,7 +207,7 @@ MCP Servers:
 
 Servers are reusable across agents and do not need awareness of GPARS. GPARS security policy is enforced at the plane boundary enforcement point, not by MCP servers. Servers interact with underlying infrastructure on behalf of the agent — the agent never interacts with infrastructure directly.
 
-### 5.3 Plane Boundary
+### 6.3 Plane Boundary
 
 The boundary between the Cognitive Plane and the Action Plane MUST be enforced by a user-controlled enforcement point. MCP servers MUST NOT accept requests directly from the Cognitive Plane without passing through this enforcement point.
 
@@ -205,16 +224,16 @@ The critical requirement is: **the agent must not be able to self-assert its ide
 
 ---
 
-## 6. Environment-Modifying Operations
+## 7. Environment-Modifying Operations
 
-### 6.1 EMO Rules
+### 7.1 EMO Rules
 
 1. All EMOs MUST be executed exclusively through MCP servers.
 2. Agents MUST NOT perform EMOs internally.
 3. MCP responses MUST be treated as authoritative representations of Environment State.
 4. Internal simulations of tool output are permitted but MUST NOT be treated as authoritative.
 
-### 6.2 EMO Classification
+### 7.2 EMO Classification
 
 **Operations that are EMOs** (MUST go through MCP):
 - Reading or writing files
@@ -232,7 +251,7 @@ The critical requirement is: **the agent must not be able to self-assert its ide
 - Internal memory summarization
 - Token-level reasoning or computation
 
-### 6.3 Edge Cases
+### 7.3 Edge Cases
 
 - Cached or checkpointed internal memory is ICS unless it is authoritative or shared externally.
 - Simulations of tool output are allowed but MUST NOT be treated as authoritative.
@@ -241,9 +260,9 @@ The critical requirement is: **the agent must not be able to self-assert its ide
 
 ---
 
-## 7. Agent Manifest
+## 8. Agent Manifest
 
-### 7.1 Manifest Structure
+### 8.1 Manifest Structure
 
 The manifest MUST be provided to the Agent Runtime before the agent loop begins.
 
@@ -258,7 +277,7 @@ Minimal structure:
 }
 ```
 
-### 7.2 Required MCP Servers
+### 8.2 Required MCP Servers
 
 The field `required_mcp_servers` is REQUIRED.
 
@@ -289,41 +308,41 @@ Example:
 
 All declared servers in this field are mandatory for the agent to function as intended. The manifest is declarative — it describes what the agent needs, not a precondition for starting the agent loop. If a required server is unavailable at operation time, the agent receives a standard error and handles it accordingly.
 
-### 7.3 Optional MCP Servers
+### 8.3 Optional MCP Servers
 
 The field `optional_mcp_servers` is OPTIONAL.
 
 Optional servers follow the same schema as required servers. If an optional server is unavailable, the agent MAY continue operating without it. Degradation behavior for missing optional servers is implementation-defined.
 
-### 7.4 Identity Field
+### 8.4 Identity Field
 
 The `id` field is REQUIRED. It MUST uniquely identify the agent within its operational domain.
 
 The format, issuance mechanism, and verification model are implementation-defined in v0.1.
 
-### 7.5 Permission Scopes
+### 8.5 Permission Scopes
 
 Permission scopes in v0.1 are **server-defined and opaque to GPARS**. Each MCP server defines the scopes it recognizes. GPARS does not standardize a scope taxonomy.
 
-The manifest declares which scopes the agent requires. These are capability *requirements* — they describe what the agent needs in order to function. They are NOT authorization grants. Whether the agent is actually permitted to exercise those scopes is determined by the user's security policy on the Action Plane (see [Section 8](#8-security-policy)).
+The manifest declares which scopes the agent requires. These are capability *requirements* — they describe what the agent needs in order to function. They are NOT authorization grants. Whether the agent is actually permitted to exercise those scopes is determined by the user's security policy on the Action Plane (see [Section 9](#9-security-policy)).
 
 ---
 
-## 8. Security Policy
+## 9. Security Policy
 
-### 8.1 Policy Authority
+### 9.1 Policy Authority
 
 The **user** is the policy authority. The user owns the Action Plane — its data, systems, and infrastructure — and defines what agents are permitted to do within it.
 
 The security policy:
 - MUST be defined by the user (or by a policy management engine acting on the user's behalf).
-- MUST be bound to the agent's verified identity as determined by the plane boundary enforcement point (see [Section 5.3](#53-plane-boundary)) — NOT by the agent's self-declared `id` field.
+- MUST be bound to the agent's verified identity as determined by the plane boundary enforcement point (see [Section 6.3](#63-plane-boundary)) — NOT by the agent's self-declared `id` field.
 - MUST be enforced at the Action Plane boundary (the enforcement point), not by the agent itself.
 - MAY support a default policy that applies when no agent-specific policy is defined.
 
 The agent does not participate in defining, negotiating, or interpreting the security policy. The agent is a subject of the policy, not an author of it. The agent cannot influence how it is identified to the Action Plane.
 
-### 8.2 Policy Scope
+### 9.2 Policy Scope
 
 The security policy governs what operations an agent may perform within MCP server sessions. This includes but is not limited to:
 - Which MCP servers the agent may connect to.
@@ -332,7 +351,7 @@ The security policy governs what operations an agent may perform within MCP serv
 
 The agent is NOT informed of its effective permissions. The agent discovers its boundaries by receiving authorization denials when it attempts operations that violate the policy. This mirrors how user processes interact with operating system security — a process does not receive its SELinux policy; it receives `EACCES` when it violates it.
 
-### 8.3 Standard Errors
+### 9.3 Standard Errors
 
 GPARS defines the following standard MCP-level error codes:
 
@@ -389,7 +408,7 @@ The agent MAY retry after receiving `SERVER_UNAVAILABLE`, as the server may beco
 
 ---
 
-## 9. Activation and Processing Model
+## 10. Activation and Processing Model
 
 1. The Agent provides the manifest to the Agent Runtime.
 2. The Agent Runtime validates manifest structure and resolves required MCP registry identifiers.
@@ -404,7 +423,7 @@ The manifest is a declarative statement of what the agent needs — not an activ
 
 ---
 
-## 10. Enforcement Model
+## 11. Enforcement Model
 
 The manifest and the security policy serve different roles:
 
@@ -423,7 +442,7 @@ The agent is never trusted to enforce its own boundaries or assert its own ident
 
 ---
 
-## 11. Compliance Levels
+## 12. Compliance Levels
 
 **Cognitive Plane (Agent) compliance:**
 
@@ -443,7 +462,7 @@ Partial or transitional compliance levels are not defined in v0.1 and are reserv
 
 ---
 
-## 12. Security Considerations
+## 13. Security Considerations
 
 - By externalizing EMOs, agents avoid executing untrusted or privileged actions internally.
 - The user's security policy is the sole authorization authority. Agents cannot self-authorize.
@@ -457,7 +476,7 @@ Partial or transitional compliance levels are not defined in v0.1 and are reserv
 
 ---
 
-## 13. Extension Model
+## 14. Extension Model
 
 - Agents and MCP servers MAY declare additional metadata (capability descriptions, optional policies, discovery endpoints).
 - Extension points MUST NOT violate the ICS/ES separation.
@@ -466,7 +485,7 @@ Partial or transitional compliance levels are not defined in v0.1 and are reserv
 
 ---
 
-## 14. Rationale
+## 15. Rationale
 
 - **Separation of Cognition and Action:** Prevents cognitive bias induced by embedded execution tools. When tools are internal, the agent's reasoning is shaped by their implementation. Externalization ensures the agent reasons about *what* to do, not *how* tools work.
 - **User-Owned Security:** The user owns the data and systems the agent operates on. The user — not the agent, not the agent developer — defines what is permitted. This mirrors established security models in operating systems, cloud platforms, and enterprise infrastructure.
@@ -477,7 +496,7 @@ Partial or transitional compliance levels are not defined in v0.1 and are reserv
 
 ---
 
-## 15. Non-Goals (v0.1)
+## 16. Non-Goals (v0.1)
 
 GPARS v0.1 does NOT:
 
@@ -495,7 +514,7 @@ These concerns are reserved for future revisions.
 
 ---
 
-## 16. References
+## 17. References
 
 ### Normative
 

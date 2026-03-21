@@ -1,0 +1,26 @@
+---
+title: "Why general-purpose?"
+description: "What makes an agent general-purpose, and why GPARS is designed around that principle."
+---
+
+An agent that embeds its tools is limited by them. If execution capabilities are built into the agent — a hardcoded Bash tool, a built-in file reader, a baked-in HTTP client — then the agent's capability surface is fixed at development time. It can only operate in environments that match those built-in tools. Change the environment, and the agent breaks or cannot adapt. This is a **special-purpose agent**: capable within its designed context, brittle outside of it.
+
+A **general-purpose agent** has no intrinsic capabilities beyond cognition. It does not embed tools that touch the environment. Instead, it declares what it needs (via a manifest) and composes capabilities from external MCP servers provided by the environment. The same cognitive core can operate as a coding assistant in one environment, a research agent in another, and a system administrator in a third — depending entirely on which MCP servers are available.
+
+This is the architectural consequence of the Cognitive Plane / Action Plane separation:
+
+<CardGroup cols={1}>
+  <Card title="Embedded tools lock the agent to a fixed capability surface" icon="lock">
+    The agent can only do what was built into it. Adding capabilities requires modifying the agent itself.
+  </Card>
+  <Card title="Externalized tools via MCP make the capability surface composable" icon="puzzle-piece">
+    The agent can operate across any environment that provides MCP servers matching its declared requirements. Adding capabilities means adding MCP servers — the agent doesn't change.
+  </Card>
+  <Card title="Specialization comes from the agent loop, not from embedded tools" icon="brain">
+    Two agents using identical MCP servers can behave entirely differently based on their system prompts, skills, reasoning architecture, and goals. The tools don't define the agent — the cognition does.
+  </Card>
+</CardGroup>
+
+This is what "general-purpose" means in GPARS. The standard does not make agents smarter or more capable. It makes them **portable, composable, and environment-independent** by ensuring they are not architecturally bound to a fixed set of capabilities.
+
+Every normative requirement in this specification — the plane separation, the manifest, the enforcement model, the security policy — exists to support and enforce this principle.

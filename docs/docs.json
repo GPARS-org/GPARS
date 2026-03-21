@@ -22,6 +22,7 @@
             "group": "Overview",
             "pages": [
               "index",
+              "spec/why-general-purpose",
               "spec/scope",
               "spec/conformance",
               "spec/terminology"
