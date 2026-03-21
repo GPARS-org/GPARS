@@ -1,0 +1,66 @@
+---
+title: "Agent manifest"
+description: "Declaring capability requirements via a machine-readable manifest."
+---
+
+## Manifest structure
+
+The manifest MUST be provided to the Agent Runtime before the agent loop begins.
+
+The formal schema is defined in [`agent_capability_manifest_schema.json`](https://github.com/GPARS-org/GPARS/blob/main/spec/v0.1/agent_capability_manifest_schema.json).
+
+Minimal structure:
+
+```json
+{
+  "id": "org:example/agent:researcher-v1",
+  "required_mcp_servers": []
+}
+```
+
+## Required MCP servers
+
+The field `required_mcp_servers` is REQUIRED.
+
+Each entry MUST include:
+
+- `server_id` — canonical identifier from an official MCP registry.
+- `version` — semantic version constraint.
+- `permission_scopes` — list of required scopes.
+
+```json
+{
+  "required_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/bash",
+      "version": ">=1.0.0",
+      "permission_scopes": ["execute"]
+    },
+    {
+      "server_id": "registry.openmcp.org/filesystem",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ]
+}
+```
+
+All declared servers in this field are mandatory for the agent to function as intended. The manifest is declarative — it describes what the agent needs, not a precondition for starting the agent loop. If a required server is unavailable at operation time, the agent receives a standard error and handles it accordingly.
+
+## Optional MCP servers
+
+The field `optional_mcp_servers` is OPTIONAL.
+
+Optional servers follow the same schema as required servers. If an optional server is unavailable, the agent MAY continue operating without it. Degradation behavior for missing optional servers is implementation-defined.
+
+## Identity field
+
+The `id` field is REQUIRED. It MUST uniquely identify the agent within its operational domain.
+
+The format, issuance mechanism, and verification model are implementation-defined in v0.1.
+
+## Permission scopes
+
+Permission scopes in v0.1 are **server-defined and opaque to GPARS**. Each MCP server defines the scopes it recognizes. GPARS does not standardize a scope taxonomy.
+
+The manifest declares which scopes the agent requires. These are capability *requirements* — they describe what the agent needs in order to function. They are NOT authorization grants. Whether the agent is actually permitted to exercise those scopes is determined by the user's [security policy](/spec/security-policy).

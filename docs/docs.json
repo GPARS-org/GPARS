@@ -1,0 +1,96 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "GPARS",
+  "theme": "maple",
+  "colors": {
+    "primary": "#7b3687",
+    "light": "#a45ca9",
+    "dark": "#5c1f6b"
+  },
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#0a0f27"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Specification",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "index",
+              "spec/scope",
+              "spec/conformance",
+              "spec/terminology"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "spec/architecture",
+              "spec/emo"
+            ]
+          },
+          {
+            "group": "Agent manifest",
+            "pages": [
+              "spec/manifest"
+            ]
+          },
+          {
+            "group": "Security",
+            "pages": [
+              "spec/security-policy",
+              "spec/enforcement",
+              "spec/security-considerations"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "spec/processing-model",
+              "spec/compliance",
+              "spec/extension-model"
+            ]
+          },
+          {
+            "group": "Context",
+            "pages": [
+              "spec/rationale",
+              "spec/non-goals",
+              "spec/references"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Examples",
+        "groups": [
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/worked-example",
+              "examples/manifests"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "appearance": {
+    "default": "dark"
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/GPARS-org/GPARS"
+    }
+  }
+}

@@ -1,0 +1,144 @@
+---
+title: "Worked example"
+description: "A complete end-to-end walkthrough of a GPARS-compliant coding agent interacting with the Action Plane."
+---
+
+<Note>
+This appendix is non-normative.
+</Note>
+
+This walkthrough follows a coding assistant agent through startup, a successful operation, an authorization denial, and a server unavailability error.
+
+## Agent manifest
+
+A coding assistant agent declares the following manifest:
+
+```json
+{
+  "id": "org:example/agent:coding-assistant-v1",
+  "version": "0.1.0",
+  "required_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/bash",
+      "version": ">=1.0.0",
+      "permission_scopes": ["execute"]
+    },
+    {
+      "server_id": "registry.openmcp.org/filesystem",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    },
+    {
+      "server_id": "registry.openmcp.org/git",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ]
+}
+```
+
+## Agent startup
+
+<Steps>
+  <Step title="Manifest received">
+    The Agent Runtime receives the manifest and validates its structure.
+  </Step>
+  <Step title="Registry resolution">
+    The Agent Runtime resolves the three `server_id` values against the MCP registry.
+  </Step>
+  <Step title="Loop begins">
+    The agent loop begins. No MCP server availability check is required.
+  </Step>
+</Steps>
+
+## Successful operation
+
+The agent decides to read a file. It issues an MCP request through the plane boundary:
+
+**Request** (from agent, through enforcement point, to filesystem server):
+```json
+{
+  "method": "read_file",
+  "params": {
+    "path": "/home/user/project/src/main.py"
+  }
+}
+```
+
+The enforcement point verifies the agent's identity (using infrastructure under the user's control), evaluates the request against the security policy, confirms read access is permitted for this path, and forwards the request to the filesystem MCP server. The server returns:
+
+**Response:**
+```json
+{
+  "result": {
+    "content": "def main():\n    print('hello world')\n"
+  }
+}
+```
+
+## Authorization denied
+
+The agent attempts to write to a protected path:
+
+**Request:**
+```json
+{
+  "method": "write_file",
+  "params": {
+    "path": "/etc/passwd",
+    "content": "malicious content"
+  }
+}
+```
+
+The user's security policy denies write access to `/etc/`. The enforcement point returns:
+
+**Response:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "error": {
+    "code": -32001,
+    "message": "Write access to /etc/passwd is not permitted for this agent.",
+    "data": {
+      "gpars_code": "AUTHORIZATION_DENIED"
+    }
+  }
+}
+```
+
+The agent treats this as authoritative, does not retry, and attempts an alternative approach.
+
+## Server unavailable
+
+The agent attempts to use the git MCP server, which is not currently running:
+
+**Request:**
+```json
+{
+  "method": "git_status",
+  "params": {
+    "repo": "/home/user/project"
+  }
+}
+```
+
+The enforcement point cannot reach the git server and returns:
+
+**Response:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "error": {
+    "code": -32002,
+    "message": "MCP server 'registry.openmcp.org/git' is not reachable.",
+    "data": {
+      "gpars_code": "SERVER_UNAVAILABLE"
+    }
+  }
+}
+```
+
+The agent may retry later or continue operating with the capabilities that are available.

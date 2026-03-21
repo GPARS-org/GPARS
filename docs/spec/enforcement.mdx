@@ -1,0 +1,28 @@
+---
+title: "Enforcement model"
+description: "How the manifest and security policy work together to control agent behavior."
+---
+
+The manifest and the security policy serve different roles:
+
+| Concern | Owner | Where it lives | When it applies |
+|---------|-------|----------------|-----------------|
+| **Capability Requirements** | Agent developer | Manifest (Cognitive Plane) | Declarative (informational) |
+| **Security Policy** | User | Action Plane | Continuously during operation |
+
+The manifest declares what the agent needs. The security policy determines what the agent is allowed to do. These are independent — an agent may declare a requirement for `filesystem: ["read", "write"]` but the user's policy may only permit `read` on specific paths.
+
+## Enforcement points
+
+<CardGroup cols={2}>
+  <Card title="Boundary" icon="shield-halved">
+    The plane boundary enforcement point verifies agent identity, evaluates requests against the security policy, and routes permitted requests to MCP servers. The agent cannot bypass this point. Unauthorized operations receive `AUTHORIZATION_DENIED`. Unavailable servers return `SERVER_UNAVAILABLE`.
+  </Card>
+  <Card title="Operation" icon="server">
+    MCP servers may enforce their own operational constraints (e.g., resource limits, invalid parameters) and return standard MCP errors. MCP servers are NOT required to implement GPARS security policy logic.
+  </Card>
+</CardGroup>
+
+<Warning>
+The agent is never trusted to enforce its own boundaries or assert its own identity. All enforcement occurs outside the Cognitive Plane, under the user's control.
+</Warning>

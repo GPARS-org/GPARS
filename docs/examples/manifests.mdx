@@ -1,0 +1,86 @@
+---
+title: "Example manifests"
+description: "Sample agent capability manifests for common agent types."
+---
+
+## Minimal manifest
+
+The smallest valid GPARS manifest. Declares an agent identity and an empty list of required servers.
+
+```json
+{
+  "id": "org:example/agent:minimal-v1",
+  "required_mcp_servers": []
+}
+```
+
+## Coding assistant
+
+A coding agent that needs shell access, filesystem operations, and git.
+
+```json
+{
+  "id": "org:example/agent:coding-assistant-v1",
+  "version": "0.1.0",
+  "required_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/bash",
+      "version": ">=1.0.0",
+      "permission_scopes": ["execute"]
+    },
+    {
+      "server_id": "registry.openmcp.org/filesystem",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    },
+    {
+      "server_id": "registry.openmcp.org/git",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ],
+  "optional_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/browser",
+      "version": ">=1.0.0",
+      "permission_scopes": ["navigate", "read"]
+    }
+  ]
+}
+```
+
+## Research assistant
+
+A research agent that needs web browsing and file storage, with an optional database for caching results. Includes extension metadata for research-specific configuration.
+
+```json
+{
+  "id": "org:example/agent:research-assistant-v1",
+  "version": "0.1.0",
+  "required_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/browser",
+      "version": ">=1.0.0",
+      "permission_scopes": ["navigate", "read"]
+    },
+    {
+      "server_id": "registry.openmcp.org/filesystem",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ],
+  "optional_mcp_servers": [
+    {
+      "server_id": "registry.openmcp.org/database",
+      "version": ">=1.0.0",
+      "permission_scopes": ["read", "write"]
+    }
+  ],
+  "extensions": {
+    "org.example.research": {
+      "max_search_depth": 3,
+      "preferred_sources": ["arxiv", "scholar"]
+    }
+  }
+}
+```

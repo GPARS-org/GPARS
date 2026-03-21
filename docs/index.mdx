@@ -1,0 +1,43 @@
+---
+title: "Introduction"
+description: "General-Purpose Agent Reference Standard (GPARS) v0.1.0"
+---
+
+| | |
+|---|---|
+| **Version** | 0.1.0 |
+| **Status** | Draft |
+| **Date** | 2026-03-04 |
+
+## Abstract
+
+An agent is general-purpose when its capabilities are not limited by what is embedded inside it. GPARS achieves this by mandating that all environment-modifying operations go through MCP-compliant servers, not embedded tools. Agents declare their requirements via a manifest, and authorization is enforced by the user at the Action Plane boundary — agents cannot self-authorize or self-assert their identity.
+
+## What is GPARS?
+
+The General-Purpose Agent Reference Standard (GPARS) defines a normative structure for separating cognitive agents from external capabilities using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+
+Current agent systems — even those leveraging MCP — embed tool implementations directly within the agent loop. This creates tight coupling between reasoning and execution, produces vendor-specific behavior, and prevents true portability. A general-purpose agent cannot presume intrinsic capabilities; it must operate across environments by composing externalized services.
+
+GPARS establishes a **strict separation between cognition and action**: all Environment-Modifying Operations MUST be externalized through MCP-compliant servers. Agents declare their capability requirements via a machine-readable manifest, enabling deterministic, composable, and governable capability surfaces.
+
+<Info>
+This specification targets **MCP 2025-11-25** (latest stable revision at time of writing). Future GPARS versions MAY update this dependency as MCP evolves.
+</Info>
+
+## Key principles
+
+<CardGroup cols={2}>
+  <Card title="Cognition / Action separation" icon="brain">
+    Agents reason internally but act exclusively through MCP servers. No embedded tools that touch the environment.
+  </Card>
+  <Card title="User-owned security" icon="shield-halved">
+    The user controls the Action Plane and defines what agents are permitted to do. Agents cannot self-authorize.
+  </Card>
+  <Card title="Declarative manifests" icon="file-code">
+    Agents declare what MCP servers they need. The manifest is a requirement, not an authorization grant.
+  </Card>
+  <Card title="Discovery-based authorization" icon="lock">
+    Agents discover their permission boundaries by receiving denials, just like OS processes.
+  </Card>
+</CardGroup>

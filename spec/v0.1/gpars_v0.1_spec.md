@@ -177,7 +177,7 @@ The Action Plane is **owned by the user**. It contains the user's data, systems,
 
 The Action Plane contains:
 - **Security Policy** — user-defined rules governing agent permissions (see [Section 8](#8-security-policy)).
-- **MCP Servers** — capability providers that execute operations and enforce policy.
+- **MCP Servers** — capability providers that execute operations on behalf of agents.
 - **Infrastructure** — OS, network, hardware, storage that MCP servers operate on.
 
 MCP Servers:
@@ -561,7 +561,7 @@ The agent decides to read a file. It issues an MCP request through the plane bou
 }
 ```
 
-The enforcement point verifies the agent's identity (using infrastructure under the user's control), then forwards the request to the filesystem MCP server. The server checks the security policy, confirms read access is permitted for this path, and returns:
+The enforcement point verifies the agent's identity (using infrastructure under the user's control), evaluates the request against the security policy, confirms read access is permitted for this path, and forwards the request to the filesystem MCP server. The server returns:
 
 **Response:**
 ```json

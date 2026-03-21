@@ -1,0 +1,16 @@
+---
+title: "Terminology"
+description: "Definitions of key terms used in the GPARS specification."
+---
+
+| Term | Definition |
+|------|------------|
+| **Agent** | A cognitive process that generates MCP requests. An agent reasons, plans, and evaluates goals but does not execute actions directly. |
+| **General-Purpose Agent** | An agent designed to operate across variable capability ecosystems without presuming intrinsic capabilities. Specialization emerges from the agent loop (system prompts, skills, reasoning) — not from embedded tools. |
+| **Agent Runtime** | The execution environment for the agent. Belongs to the Cognitive Plane. Responsible for running the agent, managing its lifecycle, validating manifests, and holding MCP client instances. |
+| **MCP Server** | A capability provider implementing MCP. |
+| **Security Policy** | A set of rules defined by the user (the owner of the Action Plane) that governs what operations an agent is permitted to perform. The policy is bound to an agent identity and enforced at the Action Plane boundary. |
+| **Internal Cognitive State (ICS)** | State fully isolated to a single agent execution context, whose modifications or observations have no authoritative effect outside the agent. Examples: planning buffers, ephemeral memory, simulated outputs. |
+| **Environment State (ES)** | Any state whose modification or retrieval can influence or be observed by external systems, agents, or principals. Examples: filesystems, databases, network endpoints, MCP servers, shared memory, hardware devices. |
+| **Environment-Modifying Operation (EMO)** | Any operation that modifies or retrieves Environment State. This includes both reads and writes. |
+| **Capability Manifest** | A machine-readable declaration of the MCP servers, permissions, and optional capabilities required for an agent to operate. The manifest is a capability *requirement*, not an authorization grant. |

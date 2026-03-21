@@ -1,0 +1,25 @@
+---
+title: "Rationale"
+description: "Why GPARS makes the design choices it does."
+---
+
+<AccordionGroup>
+  <Accordion title="Separation of Cognition and Action">
+    Prevents cognitive bias induced by embedded execution tools. When tools are internal, the agent's reasoning is shaped by their implementation. Externalization ensures the agent reasons about *what* to do, not *how* tools work.
+  </Accordion>
+  <Accordion title="User-Owned Security">
+    The user owns the data and systems the agent operates on. The user — not the agent, not the agent developer — defines what is permitted. This mirrors established security models in operating systems, cloud platforms, and enterprise infrastructure.
+  </Accordion>
+  <Accordion title="Declarative Environment Requirements">
+    Ensures deterministic agent behavior and runtime portability. An agent's manifest fully describes what it needs to function.
+  </Accordion>
+  <Accordion title="Discovery-Based Authorization">
+    Agents are not told their effective permissions. They discover boundaries by receiving denials. This prevents agents from gaming policy boundaries and keeps the security model simple.
+  </Accordion>
+  <Accordion title="Modularity">
+    Enables emergent behavior across heterogeneous MCP capability ecosystems. Different cognitive models, reasoning architectures, and vendors can be composed without rewriting tool logic.
+  </Accordion>
+  <Accordion title="General-Purpose Validity">
+    A truly general-purpose agent operates across environments without presuming intrinsic capabilities. Specialization comes from the agent loop — not from embedded tools.
+  </Accordion>
+</AccordionGroup>

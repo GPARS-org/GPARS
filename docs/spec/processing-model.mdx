@@ -1,0 +1,35 @@
+---
+title: "Processing model"
+description: "How agents activate and interact with the Action Plane at runtime."
+---
+
+## Activation and processing flow
+
+<Steps>
+  <Step title="Manifest provided">
+    The Agent provides the manifest to the Agent Runtime.
+  </Step>
+  <Step title="Validation">
+    The Agent Runtime validates manifest structure and resolves required MCP registry identifiers.
+  </Step>
+  <Step title="Agent loop begins">
+    The agent loop begins. The agent's lifecycle is independent of MCP server availability.
+  </Step>
+  <Step title="MCP request issued">
+    When the agent issues an MCP request, it passes through the plane boundary enforcement point.
+  </Step>
+  <Step title="Identity verification">
+    The enforcement point verifies the agent's identity using infrastructure under the user's control (not by trusting the manifest's `id` field).
+  </Step>
+  <Step title="Policy evaluation">
+    The enforcement point evaluates the request against the user's security policy. Operations that violate the policy are denied with `AUTHORIZATION_DENIED`.
+  </Step>
+  <Step title="Availability check">
+    If the target MCP server is unavailable, the enforcement point returns `SERVER_UNAVAILABLE`. The agent MAY retry, wait, or adapt its approach.
+  </Step>
+  <Step title="Request forwarded">
+    If the request is permitted and the server is available, the enforcement point forwards the request. The MCP server processes it and returns a result or an operational error (e.g., invalid parameters, resource not found).
+  </Step>
+</Steps>
+
+The manifest is a declarative statement of what the agent needs — not an activation gate. Manifest interpretation occurs once, at the Agent Runtime (Cognitive Plane). Policy enforcement and availability are discovered at operation time, at the Action Plane boundary. MCP servers handle operational concerns; the enforcement point handles security concerns.

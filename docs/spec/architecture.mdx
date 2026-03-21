@@ -1,0 +1,153 @@
+---
+title: "Architecture"
+description: "The two-plane model: Cognitive Plane, Action Plane, and the boundary between them."
+mode: "wide"
+---
+
+GPARS defines two planes separated by a hard boundary. The Cognitive Plane is where the agent reasons. The Action Plane is where operations execute. The Action Plane is owned by the user and is the sole authority over what agents are permitted to do within it.
+
+<div className="mt-8 mb-8 max-w-2xl mx-auto">
+  {/* Cognitive Plane */}
+  <div className="rounded-xl border-2 border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-950 p-6 mb-0">
+    <div className="flex items-center gap-2 mb-4">
+      <Icon icon="brain" size={20} />
+      <span className="text-xl font-semibold text-purple-900 dark:text-purple-200">Cognitive Plane</span>
+    </div>
+    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+      <span className="block text-base font-semibold text-purple-800 dark:text-purple-300 mb-3">Agent Runtime</span>
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div className="bg-purple-50 dark:bg-purple-950 rounded-lg p-3 border border-purple-200 dark:border-purple-700 text-center">
+          <Icon icon="brain" size={18} className="mx-auto mb-1" />
+          <span className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">Agent Loop</span>
+          <span className="block text-xs text-purple-500 dark:text-purple-400">reasoning · internal tools</span>
+        </div>
+        <div className="bg-purple-50 dark:bg-purple-950 rounded-lg p-3 border border-purple-200 dark:border-purple-700 text-center">
+          <Icon icon="file-check" size={18} className="mx-auto mb-1" />
+          <span className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">Manifest</span>
+          <span className="block text-xs text-purple-500 dark:text-purple-400">validation · resolution</span>
+        </div>
+        <div className="bg-purple-50 dark:bg-purple-950 rounded-lg p-3 border border-purple-200 dark:border-purple-700 text-center">
+          <Icon icon="plug" size={18} className="mx-auto mb-1" />
+          <span className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">MCP Clients</span>
+          <span className="block text-xs text-purple-500 dark:text-purple-400">outbound requests</span>
+        </div>
+      </div>
+      <span className="block text-sm text-gray-500 dark:text-gray-400 italic">Internal Cognitive State only — no direct environment access</span>
+    </div>
+  </div>
+
+  {/* Arrow + Boundary */}
+  <div className="flex flex-col items-center py-0 my-0">
+    <div className="w-px h-4 bg-gray-400 dark:bg-gray-500"></div>
+    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+      <span className="text-base text-gray-400 dark:text-gray-500">↑</span>
+      <span className="text-base font-semibold font-mono text-gray-700 dark:text-gray-300">MCP</span>
+      <span className="text-base text-gray-400 dark:text-gray-500">↓</span>
+    </div>
+    <div className="w-px h-4 bg-gray-400 dark:bg-gray-500"></div>
+    <div className="w-full max-w-lg border-2 border-dashed border-amber-400 dark:border-amber-500 rounded-lg bg-amber-50 dark:bg-amber-950 px-4 py-3 text-center relative z-10 mb-[-1rem]">
+      <div className="flex items-center justify-center gap-2 mb-1">
+        <Icon icon="shield-halved" size={18} />
+        <span className="text-base font-semibold text-amber-800 dark:text-amber-300">Plane Boundary</span>
+      </div>
+      <p className="text-sm text-amber-700 dark:text-amber-400">user-controlled enforcement point</p>
+      <div className="flex flex-wrap justify-center gap-2 mt-2">
+        <span className="text-sm px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-300">identity verification</span>
+        <span className="text-sm px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-300">policy evaluation</span>
+        <span className="text-sm px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-300">request routing</span>
+      </div>
+    </div>
+  </div>
+
+  {/* Action Plane */}
+  <div className="rounded-xl border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950 p-6 pt-8 mt-0">
+    <div className="flex items-center gap-2 mb-4">
+      <Icon icon="server" size={20} />
+      <span className="text-xl font-semibold text-blue-900 dark:text-blue-200">Action Plane</span>
+      <span className="text-sm px-2 py-0.5 rounded bg-blue-200 dark:bg-blue-900 text-blue-700 dark:text-blue-300 ml-auto">owned by user</span>
+    </div>
+    <div className="grid grid-cols-4 gap-3 mb-4">
+      <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-blue-200 dark:border-blue-800 text-center">
+        <Icon icon="terminal" size={18} className="mx-auto" />
+        <span className="block text-base font-medium text-blue-800 dark:text-blue-300">bash</span>
+        <span className="block text-sm text-gray-500 dark:text-gray-400">server</span>
+      </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-blue-200 dark:border-blue-800 text-center">
+        <Icon icon="folder" size={18} className="mx-auto" />
+        <span className="block text-base font-medium text-blue-800 dark:text-blue-300">filesystem</span>
+        <span className="block text-sm text-gray-500 dark:text-gray-400">server</span>
+      </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-blue-200 dark:border-blue-800 text-center">
+        <Icon icon="database" size={18} className="mx-auto" />
+        <span className="block text-base font-medium text-blue-800 dark:text-blue-300">database</span>
+        <span className="block text-sm text-gray-500 dark:text-gray-400">server</span>
+      </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-blue-200 dark:border-blue-800 text-center">
+        <Icon icon="code-branch" size={18} className="mx-auto" />
+        <span className="block text-base font-medium text-blue-800 dark:text-blue-300">git</span>
+        <span className="block text-sm text-gray-500 dark:text-gray-400">server</span>
+      </div>
+    </div>
+    <div className="bg-blue-100 dark:bg-blue-900 rounded-lg p-3 text-center">
+      <span className="text-sm text-blue-700 dark:text-blue-300">OS · network · hardware · storage</span>
+    </div>
+  </div>
+</div>
+
+The boundary between planes is the central architectural constraint of GPARS. The Cognitive Plane MUST NOT perform Environment-Modifying Operations directly. All such operations MUST cross the boundary via MCP. The user's security policy governs what the agent is permitted to do once operations reach the Action Plane.
+
+## Cognitive Plane
+
+Contains the Agent Runtime and the Agent.
+
+### Agent Runtime
+
+The Runtime is the execution environment for the agent. It:
+- MUST receive and validate the agent manifest before the agent loop begins.
+- MUST resolve required MCP registry identifiers.
+- MUST manage MCP client instances for outbound requests.
+
+The Runtime belongs to the Cognitive Plane. It is NOT a security enforcement point — it is under the control of the agent developer or framework, not the user. Authorization is enforced at the Action Plane boundary.
+
+### Agent
+
+The Agent:
+- MUST perform all Environment-Modifying Operations exclusively through MCP.
+- MUST NOT embed tool implementations that modify or retrieve Environment State.
+- MAY embed tools that operate solely within Internal Cognitive State (e.g., sleep/wait, internal scheduling, retry logic, loop control).
+
+The Cognitive Plane is confined to Internal Cognitive State (ICS). Everything the agent does that does not cross the MCP boundary is cognition. Everything that crosses the boundary is action. GPARS does not restrict what happens inside the Cognitive Plane — only what crosses the boundary.
+
+## Action Plane
+
+The Action Plane is **owned by the user**. It contains the user's data, systems, and infrastructure. The user is the authority over what agents are permitted to do within it — just as a system administrator controls what users can do on a machine.
+
+The Action Plane contains:
+- **Security Policy** — user-defined rules governing agent permissions (see [Security policy](/spec/security-policy)).
+- **MCP Servers** — capability providers that execute operations on behalf of agents.
+- **Infrastructure** — OS, network, hardware, storage that MCP servers operate on.
+
+MCP Servers:
+- MUST NOT be required to interpret GPARS manifests or security policies.
+- MUST return structured result objects.
+- SHOULD provide deterministic execution boundaries.
+- MAY enforce their own operational constraints (e.g., resource limits, path restrictions inherent to the server's configuration).
+
+Servers are reusable across agents and do not need awareness of GPARS. GPARS security policy is enforced at the plane boundary enforcement point, not by MCP servers. Servers interact with underlying infrastructure on behalf of the agent — the agent never interacts with infrastructure directly.
+
+## Plane boundary
+
+The boundary between the Cognitive Plane and the Action Plane MUST be enforced by a user-controlled enforcement point. MCP servers MUST NOT accept requests directly from the Cognitive Plane without passing through this enforcement point.
+
+The enforcement point is responsible for:
+- Verifying the identity of the requesting agent (so that per-agent security policy can be applied).
+- Evaluating each MCP request against the user's security policy.
+- Returning `AUTHORIZATION_DENIED` for operations that violate the policy.
+- Returning `SERVER_UNAVAILABLE` when a target MCP server is not reachable.
+- Routing permitted requests to the appropriate MCP servers.
+
+GPARS does not mandate a specific implementation for the enforcement point. Implementers MAY use a reverse proxy, network isolation, Unix socket permissions, process-level sandboxing, or any other mechanism that ensures the Cognitive Plane cannot directly access MCP servers while bypassing the security policy.
+
+<Warning>
+The agent must not be able to self-assert its identity to the Action Plane. Identity verification MUST be performed by infrastructure under the user's control, not by trusting the agent's self-declared `id` field.
+</Warning>

@@ -1,0 +1,92 @@
+---
+title: "Security policy"
+description: "The user-owned authorization model for controlling agent behavior."
+---
+
+## Policy authority
+
+The **user** is the policy authority. The user owns the Action Plane — its data, systems, and infrastructure — and defines what agents are permitted to do within it.
+
+The security policy:
+- MUST be defined by the user (or by a policy management engine acting on the user's behalf).
+- MUST be bound to the agent's verified identity as determined by the plane boundary enforcement point (see [Plane boundary](/spec/architecture#plane-boundary)) — NOT by the agent's self-declared `id` field.
+- MUST be enforced at the Action Plane boundary (the enforcement point), not by the agent itself.
+- MAY support a default policy that applies when no agent-specific policy is defined.
+
+<Note>
+The agent does not participate in defining, negotiating, or interpreting the security policy. The agent is a subject of the policy, not an author of it. The agent cannot influence how it is identified to the Action Plane.
+</Note>
+
+## Policy scope
+
+The security policy governs what operations an agent may perform. This includes but is not limited to:
+
+<CardGroup cols={3}>
+  <Card title="Server access" icon="server">
+    Which MCP servers the agent may connect to.
+  </Card>
+  <Card title="Scope grants" icon="key">
+    Which permission scopes are granted per server.
+  </Card>
+  <Card title="Resource constraints" icon="folder-tree">
+    Which files, directories, endpoints, or databases the agent may access.
+  </Card>
+</CardGroup>
+
+The agent is NOT informed of its effective permissions. The agent discovers its boundaries by receiving authorization denials when it attempts operations that violate the policy. This mirrors how user processes interact with operating system security — a process does not receive its SELinux policy; it receives `EACCES` when it violates it.
+
+## Standard errors
+
+GPARS defines the following standard MCP-level error codes:
+
+| Code | Meaning | Returned by |
+|------|---------|-------------|
+| `AUTHORIZATION_DENIED` | The operation violates the user's security policy. | Enforcement point |
+| `SERVER_UNAVAILABLE` | The target MCP server is not reachable. | Enforcement point |
+
+GPARS errors are returned within the MCP JSON-RPC 2.0 error envelope. The GPARS error code is carried in the `data` field:
+
+- `error.code` — a JSON-RPC error code (`-32001` for policy errors, `-32002` for availability errors).
+- `error.message` — a human-readable description.
+- `error.data.gpars_code` — the GPARS standard error code.
+
+<Warning>
+Errors SHOULD NOT include the full security policy, its rules, or details about what the agent *would* be permitted to do.
+</Warning>
+
+<Tabs>
+  <Tab title="AUTHORIZATION_DENIED">
+    ```json
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "error": {
+        "code": -32001,
+        "message": "Write access to /etc/passwd is not permitted for this agent.",
+        "data": {
+          "gpars_code": "AUTHORIZATION_DENIED"
+        }
+      }
+    }
+    ```
+
+    The agent MUST treat authorization denials as authoritative. It MUST NOT retry the same denied operation expecting a different result. It MAY attempt alternative operations to achieve its goal.
+  </Tab>
+  <Tab title="SERVER_UNAVAILABLE">
+    ```json
+    {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "error": {
+        "code": -32002,
+        "message": "MCP server 'registry.openmcp.org/bash' is not reachable.",
+        "data": {
+          "gpars_code": "SERVER_UNAVAILABLE"
+        }
+      }
+    }
+    ```
+
+    The agent MAY retry after receiving `SERVER_UNAVAILABLE`, as the server may become available later.
+  </Tab>
+</Tabs>

@@ -1,0 +1,33 @@
+---
+title: "Security considerations"
+description: "Security properties and implementation guidance for GPARS deployments."
+---
+
+## Security properties
+
+<CardGroup cols={2}>
+  <Card title="No self-authorization" icon="ban">
+    The user's security policy is the sole authorization authority. Agents cannot self-authorize or grant themselves permissions.
+  </Card>
+  <Card title="Verified identity" icon="fingerprint">
+    Agent identity is verified by infrastructure under the user's control at the plane boundary — agents cannot self-assert their identity to the Action Plane.
+  </Card>
+  <Card title="Continuous enforcement" icon="shield-halved">
+    The enforcement point applies security policy on every operation before it reaches MCP servers.
+  </Card>
+  <Card title="Audit surface" icon="list-check">
+    Every EMO crosses the MCP boundary, creating a natural audit point for all agent actions.
+  </Card>
+</CardGroup>
+
+By externalizing EMOs, agents avoid executing untrusted or privileged actions internally. Authorization denials are standard and structured, enabling agents to handle them gracefully without leaking policy details.
+
+## Implementation notes
+
+<Info>
+GPARS v0.1 intentionally leaves implementation choices open. The following are suggestions, not requirements.
+</Info>
+
+- **Enforcement point implementations:** reverse proxies, network isolation, Unix socket permissions, containers, runtime sandboxes, or OS-level isolation.
+- **Identity verification mechanisms:** mTLS, API keys, process-level isolation, or other methods appropriate to your deployment.
+- **Policy management engines:** static config files, RBAC engines, or interactive approval prompts.

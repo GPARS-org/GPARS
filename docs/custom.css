@@ -1,0 +1,7 @@
+#content-area .mdx-content {
+  color: #4a4a5a;
+}
+
+.dark #content-area .mdx-content {
+  color: #c8c8d4;
+}

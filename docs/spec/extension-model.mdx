@@ -1,0 +1,26 @@
+---
+title: "Extension model"
+description: "How to extend GPARS manifests and MCP server metadata."
+---
+
+GPARS is designed to be extended without modifying the core specification. The manifest schema includes an `extensions` field for custom metadata, and the following rules govern how extensions should behave.
+
+- Agents and MCP servers MAY declare additional metadata (capability descriptions, optional policies, discovery endpoints).
+- Extension points MUST NOT violate the ICS/ES separation.
+- Versioning and backward compatibility of MCP servers SHOULD follow semantic versioning conventions.
+- Extension namespaces SHOULD use reverse-domain notation to avoid collisions.
+
+**Example** — a research agent declaring custom configuration in its manifest:
+
+```json
+{
+  "id": "org:example/agent:research-v1",
+  "required_mcp_servers": [],
+  "extensions": {
+    "org.example.research": {
+      "max_search_depth": 3,
+      "preferred_sources": ["arxiv", "scholar"]
+    }
+  }
+}
+```

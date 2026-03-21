@@ -1,0 +1,45 @@
+---
+title: "Environment-Modifying Operations"
+description: "What counts as an EMO and the rules governing them."
+---
+
+## EMO rules
+
+1. All EMOs MUST be executed exclusively through MCP servers.
+2. Agents MUST NOT perform EMOs internally.
+3. MCP responses MUST be treated as authoritative representations of Environment State.
+4. Internal simulations of tool output are permitted but MUST NOT be treated as authoritative.
+
+## EMO classification
+
+**Operations that are EMOs** (MUST go through MCP):
+- Reading or writing files
+- Network communications (HTTP, RPC, WebSocket, etc.)
+- Invoking other agents (see note below)
+- Executing shell commands
+- Accessing databases or shared stores
+- Interacting with hardware devices
+
+<Note>
+**Multi-agent interactions:** In GPARS v0.1, another agent is treated as an MCP server from the invoking agent's perspective. Agent-to-agent communication follows the same plane boundary rules, security policy enforcement, and error handling as any other MCP interaction. Dedicated agent-to-agent protocols (e.g., A2A) are out of scope for v0.1.
+</Note>
+
+**Operations that are NOT EMOs** (MAY remain internal):
+- Planning and text generation
+- Hypothetical command simulations
+- Internal memory summarization
+- Token-level reasoning or computation
+
+## Edge cases
+
+<AccordionGroup>
+  <Accordion title="Cached or checkpointed memory">
+    Internal memory caches and checkpoints are ICS unless they are authoritative or shared externally. If another system can observe or depend on the cached state, it is Environment State.
+  </Accordion>
+  <Accordion title="Simulated tool output">
+    Simulations of tool output are allowed but MUST NOT be treated as authoritative. The agent may hypothesize what a command would return, but must not act on that hypothesis as if it were real.
+  </Accordion>
+  <Accordion title="Persistent memory">
+    Memory that survives agent restart, is shared across processes, or is backed by disk is Environment State and MUST be accessed through MCP. Ephemeral memory confined to the reasoning loop is Internal Cognitive State.
+  </Accordion>
+</AccordionGroup>

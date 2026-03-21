@@ -1,0 +1,20 @@
+---
+title: "Compliance levels"
+description: "What it means for agents and infrastructure to be GPARS-compliant."
+---
+
+## Cognitive Plane (Agent) compliance
+
+| Level | Criteria |
+|-------|----------|
+| **Compliant** | Agent fully externalizes all EMOs via MCP and publishes a valid capability manifest. |
+| **Non-Compliant** | Agent performs EMOs internally or does not declare required MCP servers. |
+
+## Action Plane (Infrastructure) compliance
+
+| Level | Criteria |
+|-------|----------|
+| **Compliant** | A user-controlled enforcement point is present, verifies agent identity, enforces security policy, and returns GPARS standard errors (`AUTHORIZATION_DENIED`, `SERVER_UNAVAILABLE`). |
+| **Non-Compliant** | MCP servers accept requests directly from agents without an enforcement point, or the enforcement point does not return GPARS standard errors. |
+
+Partial or transitional compliance levels are not defined in v0.1 and are reserved for future revision.
