@@ -17,21 +17,18 @@ A coding assistant agent declares the following manifest:
 {
   "id": "org:example/agent:coding-assistant-v1",
   "version": "0.1.0",
-  "required_mcp_servers": [
+  "required_capabilities": [
     {
-      "server_id": "registry.openmcp.org/bash",
-      "version": ">=1.0.0",
-      "permission_scopes": ["execute"]
+      "id": "workspace_files",
+      "description": "Inspect and modify files in the active workspace."
     },
     {
-      "server_id": "registry.openmcp.org/filesystem",
-      "version": ">=1.0.0",
-      "permission_scopes": ["read", "write"]
+      "id": "command_execution",
+      "description": "Run local commands needed for builds, tests, and development tasks."
     },
     {
-      "server_id": "registry.openmcp.org/git",
-      "version": ">=1.0.0",
-      "permission_scopes": ["read", "write"]
+      "id": "version_control",
+      "description": "Inspect repository state and create local commits."
     }
   ]
 }
@@ -43,8 +40,8 @@ A coding assistant agent declares the following manifest:
   <Step title="Manifest received">
     The Agent Runtime receives the manifest and validates its structure.
   </Step>
-  <Step title="Registry resolution">
-    The Agent Runtime resolves the three `server_id` values against the MCP registry.
+  <Step title="Capability binding">
+    The Agent Runtime validates the declared capability IDs. Runtime configuration and the Action Plane bind those requirements to concrete MCP clients and servers according to local configuration and policy.
   </Step>
   <Step title="Loop begins">
     The agent loop begins. No MCP server availability check is required.

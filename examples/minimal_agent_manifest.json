@@ -1,4 +1,4 @@
 {
   "id": "org:example/agent:minimal-v1",
-  "required_mcp_servers": []
+  "required_capabilities": []
 }

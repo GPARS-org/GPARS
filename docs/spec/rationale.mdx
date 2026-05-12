@@ -11,7 +11,7 @@ description: "Why GPARS makes the design choices it does."
     The user owns the data and systems the agent operates on. The user — not the agent, not the agent developer — defines what is permitted. This mirrors established security models in operating systems, cloud platforms, and enterprise infrastructure.
   </Accordion>
   <Accordion title="Declarative Environment Requirements">
-    Ensures deterministic agent behavior and runtime portability. An agent's manifest fully describes what it needs to function.
+    Ensures deterministic agent behavior and runtime portability without binding the agent to specific MCP server implementations. An agent's manifest describes what it needs to function using manifest-local capability references and human-readable descriptions.
   </Accordion>
   <Accordion title="Discovery-Based Authorization">
     Agents are not told their effective permissions. They discover boundaries by receiving denials. This prevents agents from gaming policy boundaries and keeps the security model simple.

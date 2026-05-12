@@ -104,7 +104,7 @@ Contains the Agent Runtime and the Agent.
 
 The Runtime is the execution environment for the agent. It:
 - MUST receive and validate the agent manifest before the agent loop begins.
-- MUST resolve required MCP registry identifiers.
+- MUST validate manifest-local capability references.
 - MUST manage MCP client instances for outbound requests.
 
 The Runtime belongs to the Cognitive Plane. It is NOT a security enforcement point — it is under the control of the agent developer or framework, not the user. Authorization is enforced at the Action Plane boundary.

@@ -30,7 +30,7 @@ Agents that embed their tools are special-purpose — their capability surface i
 
 - **Cognitive / Action separation** — agents reason internally but act exclusively through MCP servers
 - **User-owned security** — the user controls the Action Plane and defines what agents are permitted to do
-- **Declarative manifests** — agents declare what MCP servers they need, not an authorization grant
+- **Declarative manifests** — agents declare capability requirements, not authorization grants
 - **Discovery-based authorization** — agents discover permission boundaries by receiving denials, like OS processes
 
 ## Documentation
@@ -51,8 +51,8 @@ See [`examples/`](./examples/) for sample agent manifests:
 | Manifest | Description |
 |----------|-------------|
 | [`minimal_agent_manifest.json`](./examples/minimal_agent_manifest.json) | Smallest valid manifest |
-| [`coding_agent_manifest.json`](./examples/coding_agent_manifest.json) | Coding assistant — bash, filesystem, git |
-| [`research_agent_manifest.json`](./examples/research_agent_manifest.json) | Research assistant — browser, database |
+| [`coding_agent_manifest.json`](./examples/coding_agent_manifest.json) | Coding assistant — workspace, shell, version control |
+| [`research_agent_manifest.json`](./examples/research_agent_manifest.json) | Research assistant — web research, storage, cache |
 
 ## Status
 

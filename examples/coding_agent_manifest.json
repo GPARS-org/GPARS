@@ -1,28 +1,24 @@
 {
   "id": "org:example/agent:coding-assistant-v1",
   "version": "0.1.0",
-  "required_mcp_servers": [
+  "required_capabilities": [
     {
-      "server_id": "registry.openmcp.org/bash",
-      "version": ">=1.0.0",
-      "permission_scopes": ["execute"]
+      "id": "workspace_files",
+      "description": "Inspect and modify files in the active workspace."
     },
     {
-      "server_id": "registry.openmcp.org/filesystem",
-      "version": ">=1.0.0",
-      "permission_scopes": ["read", "write"]
+      "id": "command_execution",
+      "description": "Run local commands needed for builds, tests, and development tasks."
     },
     {
-      "server_id": "registry.openmcp.org/git",
-      "version": ">=1.0.0",
-      "permission_scopes": ["read", "write"]
+      "id": "version_control",
+      "description": "Inspect repository state and create local commits."
     }
   ],
-  "optional_mcp_servers": [
+  "optional_capabilities": [
     {
-      "server_id": "registry.openmcp.org/browser",
-      "version": ">=1.0.0",
-      "permission_scopes": ["navigate", "read"]
+      "id": "browser_access",
+      "description": "Open and inspect local or external web pages for development workflows."
     }
   ]
 }

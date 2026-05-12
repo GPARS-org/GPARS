@@ -10,7 +10,7 @@ description: "How agents activate and interact with the Action Plane at runtime.
     The Agent provides the manifest to the Agent Runtime.
   </Step>
   <Step title="Validation">
-    The Agent Runtime validates manifest structure and resolves required MCP registry identifiers.
+    The Agent Runtime validates manifest structure and manifest-local capability references.
   </Step>
   <Step title="Agent loop begins">
     The agent loop begins. The agent's lifecycle is independent of MCP server availability.
@@ -32,4 +32,4 @@ description: "How agents activate and interact with the Action Plane at runtime.
   </Step>
 </Steps>
 
-The manifest is a declarative statement of what the agent needs — not an activation gate. Manifest interpretation occurs once, at the Agent Runtime (Cognitive Plane). Policy enforcement and availability are discovered at operation time, at the Action Plane boundary. MCP servers handle operational concerns; the enforcement point handles security concerns.
+The manifest is a declarative statement of what the agent needs — not an activation gate. The Agent Runtime validates the manifest, while concrete MCP client wiring is provided by runtime or deployment configuration outside the manifest. Concrete MCP server binding, policy enforcement, and availability are controlled at the Action Plane boundary. MCP servers handle operational concerns; the enforcement point handles security concerns.

@@ -14,44 +14,43 @@ Minimal structure:
 ```json
 {
   "id": "org:example/agent:researcher-v1",
-  "required_mcp_servers": []
+  "required_capabilities": []
 }
 ```
 
-## Required MCP servers
+## Required capabilities
 
-The field `required_mcp_servers` is REQUIRED.
+The field `required_capabilities` is REQUIRED.
 
 Each entry MUST include:
 
-- `server_id` — canonical identifier from an official MCP registry.
-- `version` — semantic version constraint.
-- `permission_scopes` — list of required scopes.
+- `id` — a manifest-local identifier for the declared capability requirement.
+- `description` — a human-readable description of what the agent needs.
 
 ```json
 {
-  "required_mcp_servers": [
+  "required_capabilities": [
     {
-      "server_id": "registry.openmcp.org/bash",
-      "version": ">=1.0.0",
-      "permission_scopes": ["execute"]
+      "id": "workspace_files",
+      "description": "Inspect and modify files in the active workspace."
     },
     {
-      "server_id": "registry.openmcp.org/filesystem",
-      "version": ">=1.0.0",
-      "permission_scopes": ["read", "write"]
+      "id": "version_control",
+      "description": "Inspect repository state and create local commits."
     }
   ]
 }
 ```
 
-All declared servers in this field are mandatory for the agent to function as intended. The manifest is declarative — it describes what the agent needs, not a precondition for starting the agent loop. If a required server is unavailable at operation time, the agent receives a standard error and handles it accordingly.
+Capability requirement IDs are local references within a single manifest. GPARS v0.1 does not assign global semantics to these IDs, does not define a universal capability ontology, and does not require Action Planes to infer concrete MCP tools from them. They exist so Agent Runtimes, Action Planes, user interfaces, deployment configuration, and audit logs can refer to the same declared requirement.
 
-## Optional MCP servers
+All declared capabilities in this field are mandatory for the agent to function as intended. The manifest is declarative — it describes what the agent needs, not a precondition for starting the agent loop and not an authorization grant. Concrete MCP client wiring, MCP server selection, tool exposure, and policy enforcement are controlled outside the manifest by Agent Runtime configuration and the Action Plane.
 
-The field `optional_mcp_servers` is OPTIONAL.
+## Optional capabilities
 
-Optional servers follow the same schema as required servers. If an optional server is unavailable, the agent MAY continue operating without it. Degradation behavior for missing optional servers is implementation-defined.
+The field `optional_capabilities` is OPTIONAL.
+
+Optional capabilities follow the same schema as required capabilities. If an optional capability is unavailable or denied, the agent MAY continue operating without it. Degradation behavior for missing optional capabilities is implementation-defined.
 
 ## Identity field
 
@@ -59,8 +58,8 @@ The `id` field is REQUIRED. It MUST uniquely identify the agent within its opera
 
 The format, issuance mechanism, and verification model are implementation-defined in v0.1.
 
-## Permission scopes
+## Capability descriptions
 
-Permission scopes in v0.1 are **server-defined and opaque to GPARS**. Each MCP server defines the scopes it recognizes. GPARS does not standardize a scope taxonomy.
+Capability descriptions in v0.1 are **human-readable and non-authoritative**. They help users, Agent Runtimes, and Action Plane components understand why the agent requests a capability, but they do not define permissions and MUST NOT be treated as authorization grants.
 
-The manifest declares which scopes the agent requires. These are capability *requirements* — they describe what the agent needs in order to function. They are NOT authorization grants. Whether the agent is actually permitted to exercise those scopes is determined by the user's [security policy](/spec/security-policy).
+Whether the agent is actually permitted to exercise any operation is determined by the user's [security policy](/spec/security-policy).
