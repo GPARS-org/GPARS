@@ -1,24 +1,22 @@
 {
   "id": "org:example/agent:coding-assistant-v1",
   "version": "0.1.0",
-  "required_capabilities": [
+  "capabilities": [
     {
-      "id": "workspace_files",
-      "description": "Inspect and modify files in the active workspace."
+      "id": "files_editing",
+      "description": "Can inspect and modify files in a project workspace."
     },
     {
       "id": "command_execution",
-      "description": "Run local commands needed for builds, tests, and development tasks."
+      "description": "Can run local commands for builds, tests, and development tasks."
     },
     {
       "id": "version_control",
-      "description": "Inspect repository state and create local commits."
-    }
-  ],
-  "optional_capabilities": [
+      "description": "Can inspect repository state and prepare local commits."
+    },
     {
-      "id": "browser_access",
-      "description": "Open and inspect local or external web pages for development workflows."
+      "id": "browser_assistance",
+      "description": "Can use browser-based workflows for development and verification."
     }
   ]
 }

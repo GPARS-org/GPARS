@@ -15,11 +15,11 @@ An agent is general-purpose when its capabilities are not limited by what is emb
 
 ## What is GPARS?
 
-The General-Purpose Agent Reference Standard (GPARS) defines a normative structure for separating cognitive agents from external capabilities using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+The General-Purpose Agent Reference Standard (GPARS) defines a normative structure for separating cognitive agents from external action providers using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
 
 Current agent systems — even those leveraging MCP — embed tool implementations directly within the agent loop. This creates tight coupling between reasoning and execution, produces vendor-specific behavior, and prevents true portability. A general-purpose agent cannot presume intrinsic capabilities; it must operate across environments by composing externalized services.
 
-GPARS establishes a **strict separation between cognition and action**: all Environment-Modifying Operations MUST be externalized through MCP-compliant servers. Agents declare their capability requirements via a machine-readable manifest, enabling deterministic, composable, and governable capability surfaces.
+GPARS establishes a **strict separation between cognition and action**: all Environment-Modifying Operations MUST be externalized through MCP-compliant servers. Agents declare their intended capabilities via a machine-readable manifest, while environments provide a composable and governable tool surface.
 
 <Info>
 This specification targets **MCP 2025-11-25** (latest stable revision at time of writing). Future GPARS versions MAY update this dependency as MCP evolves.
@@ -35,7 +35,7 @@ This specification targets **MCP 2025-11-25** (latest stable revision at time of
     The user controls the Action Plane and defines what agents are permitted to do. Agents cannot self-authorize.
   </Card>
   <Card title="Declarative manifests" icon="file-code">
-    Agents declare capability requirements. The manifest is descriptive, not an authorization grant.
+    Agents declare intended capabilities. The manifest is descriptive, not an authorization grant.
   </Card>
   <Card title="Discovery-based authorization" icon="lock">
     Agents discover their permission boundaries by receiving denials, just like OS processes.

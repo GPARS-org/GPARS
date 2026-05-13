@@ -10,7 +10,7 @@ The manifest and the security policy serve different roles:
 | **Capability Requirements** | Agent developer | Manifest (Cognitive Plane) | Declarative (informational) |
 | **Security Policy** | User | Action Plane | Continuously during operation |
 
-The manifest declares what the agent needs. The security policy determines what the agent is allowed to do. These are independent — an agent may declare a `workspace_files` requirement described as file inspection and modification, but the user's policy may only permit reads on specific paths.
+The manifest declares what the agent is designed to do. The security policy determines what the agent is allowed to do. These are independent — an agent may declare a `files_editing` capability described as file inspection and modification, but the user's policy may only permit reads on specific paths.
 
 ## Enforcement points
 

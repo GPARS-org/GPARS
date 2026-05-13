@@ -5,41 +5,39 @@ description: "Sample agent capability manifests for common agent types."
 
 ## Minimal manifest
 
-The smallest valid GPARS manifest. Declares an agent identity and an empty list of required capabilities.
+The smallest valid GPARS manifest. Declares an agent identity and an empty list of intended capabilities.
 
 ```json
 {
   "id": "org:example/agent:minimal-v1",
-  "required_capabilities": []
+  "capabilities": []
 }
 ```
 
 ## Coding assistant
 
-A coding agent that needs workspace access, command execution, and version-control workflows.
+A coding agent that can assist with workspace files, command execution, version-control workflows, and browser-based verification.
 
 ```json
 {
   "id": "org:example/agent:coding-assistant-v1",
   "version": "0.1.0",
-  "required_capabilities": [
+  "capabilities": [
     {
-      "id": "workspace_files",
-      "description": "Inspect and modify files in the active workspace."
+      "id": "files_editing",
+      "description": "Can inspect and modify files in a project workspace."
     },
     {
       "id": "command_execution",
-      "description": "Run local commands needed for builds, tests, and development tasks."
+      "description": "Can run local commands for builds, tests, and development tasks."
     },
     {
       "id": "version_control",
-      "description": "Inspect repository state and create local commits."
-    }
-  ],
-  "optional_capabilities": [
+      "description": "Can inspect repository state and prepare local commits."
+    },
     {
-      "id": "browser_access",
-      "description": "Open and inspect local or external web pages for development workflows."
+      "id": "browser_assistance",
+      "description": "Can use browser-based workflows for development and verification."
     }
   ]
 }
@@ -47,26 +45,24 @@ A coding agent that needs workspace access, command execution, and version-contr
 
 ## Research assistant
 
-A research agent that needs web research and file storage, with an optional cache for results. Includes extension metadata for research-specific configuration.
+A research agent that can navigate web sources, organize research outputs, and use external storage for caching. Includes extension metadata for research-specific configuration.
 
 ```json
 {
   "id": "org:example/agent:research-assistant-v1",
   "version": "0.1.0",
-  "required_capabilities": [
+  "capabilities": [
     {
       "id": "web_research",
-      "description": "Navigate web sources and read retrieved research material."
+      "description": "Can navigate web sources and read retrieved research material."
     },
     {
       "id": "research_storage",
-      "description": "Store and retrieve notes, citations, and intermediate research outputs."
-    }
-  ],
-  "optional_capabilities": [
+      "description": "Can organize notes, citations, and intermediate research outputs."
+    },
     {
-      "id": "result_cache",
-      "description": "Cache retrieved research results in an external database."
+      "id": "result_caching",
+      "description": "Can use external storage to cache retrieved research results."
     }
   ],
   "extensions": {

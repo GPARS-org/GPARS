@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/GPARS-org/GPARS/main/spec/v0.1/agent_capability_manifest_schema.json",
   "title": "GPARS Agent Capability Manifest",
-  "description": "Machine-readable declaration of capability requirements for a general-purpose agent.",
+  "description": "Machine-readable declaration of intended agent capabilities for a general-purpose agent.",
   "type": "object",
   "required": [
     "id",
-    "required_capabilities"
+    "capabilities"
   ],
   "properties": {
     "id": {
@@ -18,18 +18,11 @@
       "description": "Semantic version of the agent.",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
-    "required_capabilities": {
+    "capabilities": {
       "type": "array",
-      "description": "Capability requirements required for the agent to function as intended. Capability IDs are manifest-local references and do not carry global GPARS semantics.",
+      "description": "Declared classes of behavior the agent is designed to perform. Capability IDs are manifest-local references and do not carry global GPARS semantics.",
       "items": {
-        "$ref": "#/$defs/capability_requirement"
-      }
-    },
-    "optional_capabilities": {
-      "type": "array",
-      "description": "Capability requirements that enhance the agent but are not required for baseline operation.",
-      "items": {
-        "$ref": "#/$defs/capability_requirement"
+        "$ref": "#/$defs/capability"
       }
     },
     "extensions": {
@@ -39,7 +32,7 @@
     }
   },
   "$defs": {
-    "capability_requirement": {
+    "capability": {
       "type": "object",
       "required": [
         "id",
@@ -48,11 +41,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Manifest-local identifier for this capability requirement."
+          "description": "Manifest-local identifier for this declared agent capability."
         },
         "description": {
           "type": "string",
-          "description": "Human-readable, non-authoritative description of what the agent needs."
+          "description": "Human-readable, non-authoritative description of what the agent is designed to do."
         }
       },
       "additionalProperties": false

@@ -1,20 +1,18 @@
 {
   "id": "org:example/agent:research-assistant-v1",
   "version": "0.1.0",
-  "required_capabilities": [
+  "capabilities": [
     {
       "id": "web_research",
-      "description": "Navigate web sources and read retrieved research material."
+      "description": "Can navigate web sources and read retrieved research material."
     },
     {
       "id": "research_storage",
-      "description": "Store and retrieve notes, citations, and intermediate research outputs."
-    }
-  ],
-  "optional_capabilities": [
+      "description": "Can organize notes, citations, and intermediate research outputs."
+    },
     {
-      "id": "result_cache",
-      "description": "Cache retrieved research results in an external database."
+      "id": "result_caching",
+      "description": "Can use external storage to cache retrieved research results."
     }
   ],
   "extensions": {

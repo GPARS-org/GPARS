@@ -17,18 +17,18 @@ A coding assistant agent declares the following manifest:
 {
   "id": "org:example/agent:coding-assistant-v1",
   "version": "0.1.0",
-  "required_capabilities": [
+  "capabilities": [
     {
-      "id": "workspace_files",
-      "description": "Inspect and modify files in the active workspace."
+      "id": "files_editing",
+      "description": "Can inspect and modify files in a project workspace."
     },
     {
       "id": "command_execution",
-      "description": "Run local commands needed for builds, tests, and development tasks."
+      "description": "Can run local commands for builds, tests, and development tasks."
     },
     {
       "id": "version_control",
-      "description": "Inspect repository state and create local commits."
+      "description": "Can inspect repository state and prepare local commits."
     }
   ]
 }
@@ -40,8 +40,8 @@ A coding assistant agent declares the following manifest:
   <Step title="Manifest received">
     The Agent Runtime receives the manifest and validates its structure.
   </Step>
-  <Step title="Capability binding">
-    The Agent Runtime validates the declared capability IDs. Runtime configuration and the Action Plane bind those requirements to concrete MCP clients and servers according to local configuration and policy.
+  <Step title="Capability review">
+    The Agent Runtime validates the declared capability IDs. Runtime configuration and the Action Plane may use those declarations for local binding, user review, and audit.
   </Step>
   <Step title="Loop begins">
     The agent loop begins. No MCP server availability check is required.

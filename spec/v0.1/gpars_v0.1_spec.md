@@ -29,10 +29,9 @@ An agent is general-purpose when its capabilities are not limited by what is emb
    - 7.3 [Edge Cases](#73-edge-cases)
 8. [Agent Manifest](#8-agent-manifest)
    - 8.1 [Manifest Structure](#81-manifest-structure)
-   - 8.2 [Required MCP Servers](#82-required-mcp-servers)
-   - 8.3 [Optional MCP Servers](#83-optional-mcp-servers)
-   - 8.4 [Identity Field](#84-identity-field)
-   - 8.5 [Permission Scopes](#85-permission-scopes)
+   - 8.2 [Capabilities](#82-capabilities)
+   - 8.3 [Identity Field](#83-identity-field)
+   - 8.4 [Capability Descriptions](#84-capability-descriptions)
 9. [Security Policy](#9-security-policy)
    - 9.1 [Policy Authority](#91-policy-authority)
    - 9.2 [Policy Scope](#92-policy-scope)
@@ -54,11 +53,11 @@ An agent is general-purpose when its capabilities are not limited by what is emb
 
 ## 1. Introduction
 
-The General-Purpose Agent Reference Standard (GPARS) defines a normative structure for separating cognitive agents from external capabilities using the Model Context Protocol (MCP).
+The General-Purpose Agent Reference Standard (GPARS) defines a normative structure for separating cognitive agents from external action providers using the Model Context Protocol (MCP).
 
 Current agent systems — even those leveraging MCP — embed tool implementations directly within the agent loop. This creates tight coupling between reasoning and execution, produces vendor-specific behavior, and prevents true portability. A general-purpose agent cannot presume intrinsic capabilities; it must operate across environments by composing externalized services.
 
-GPARS establishes a **strict separation between cognition and action**: all Environment-Modifying Operations MUST be externalized through MCP-compliant servers. Agents declare their capability requirements via a machine-readable manifest, enabling deterministic, composable, and governable capability surfaces.
+GPARS establishes a **strict separation between cognition and action**: all Environment-Modifying Operations MUST be externalized through MCP-compliant servers. Agents declare their intended capabilities via a machine-readable manifest, while environments provide a composable and governable tool surface.
 
 This specification targets **MCP 2025-11-25** (latest stable revision at time of writing). Future GPARS versions MAY update this dependency as MCP evolves.
 
@@ -66,17 +65,17 @@ This specification targets **MCP 2025-11-25** (latest stable revision at time of
 
 ## 2. Why General-Purpose?
 
-An agent that embeds its tools is limited by them. If execution capabilities are built into the agent — a hardcoded Bash tool, a built-in file reader, a baked-in HTTP client — then the agent's capability surface is fixed at development time. It can only operate in environments that match those built-in tools. Change the environment, and the agent breaks or cannot adapt. This is a special-purpose agent: capable within its designed context, brittle outside of it.
+An agent that embeds its tools is limited by them. If execution tools are built into the agent — a hardcoded Bash tool, a built-in file reader, a baked-in HTTP client — then the agent's tool surface is fixed at development time. It can only operate in environments that match those built-in tools. Change the environment, and the agent breaks or cannot adapt. This is a special-purpose agent: capable within its designed context, brittle outside of it.
 
-A general-purpose agent has no intrinsic capabilities beyond cognition. It does not embed tools that touch the environment. Instead, it declares what it needs (via a manifest) and composes capabilities from external MCP servers provided by the environment. The same cognitive core can operate as a coding assistant in one environment, a research agent in another, and a system administrator in a third — depending entirely on which MCP servers are available.
+A general-purpose agent has no intrinsic tools beyond cognition. It does not embed tools that touch the environment. Instead, it declares its intended capabilities via a manifest and uses external MCP servers provided by the environment. The same cognitive core can operate as a coding assistant in one environment, a research agent in another, and a system administrator in a third — depending entirely on which MCP servers are available.
 
 This is the architectural consequence of the Cognitive Plane / Action Plane separation:
 
-- **Embedded tools lock the agent to a fixed capability surface.** The agent can only do what was built into it. Adding capabilities requires modifying the agent itself.
-- **Externalized tools via MCP make the capability surface composable.** The agent can operate across any environment where the Action Plane can satisfy its declared capability requirements. Adding capabilities means adding or binding MCP servers — the agent doesn't change.
+- **Embedded tools lock the agent to a fixed tool surface.** The agent can only use the tools that were built into it. Giving it more tools requires modifying the agent itself.
+- **Externalized tools via MCP make the tool surface composable.** The agent can operate across any environment where the Action Plane can support its declared intended capabilities. To give the agent more tools to work with, the environment adds or binds MCP servers — the agent doesn't change.
 - **Specialization comes from the agent loop, not from embedded tools.** Two agents using identical MCP servers can behave entirely differently based on their system prompts, skills, reasoning architecture, and goals. The tools don't define the agent — the cognition does.
 
-This is what "general-purpose" means in GPARS. The standard does not make agents smarter or more capable. It makes them portable, composable, and environment-independent by ensuring they are not architecturally bound to a fixed set of capabilities.
+This is what "general-purpose" means in GPARS. The standard does not make agents smarter or more capable. It makes them portable, composable, and environment-independent by ensuring they are not architecturally bound to a fixed tool surface.
 
 Every normative requirement in this specification — the plane separation, the manifest, the enforcement model, the security policy — exists to support and enforce this principle.
 
@@ -88,7 +87,7 @@ GPARS v0.1 standardizes:
 
 - Mandatory separation between cognitive reasoning and environment-modifying actions.
 - Agent capability declaration via a manifest.
-- Mandatory declaration of required capability requirements.
+- Mandatory declaration of intended agent capabilities.
 - A reference architecture defining the boundary between cognition and action.
 - A user-controlled enforcement point at the plane boundary.
 - A security policy model where the user controls agent authorization.
@@ -126,7 +125,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **Internal Cognitive State (ICS)** | State fully isolated to a single agent execution context, whose modifications or observations have no authoritative effect outside the agent. Examples: planning buffers, ephemeral memory, simulated outputs. |
 | **Environment State (ES)** | Any state whose modification or retrieval can influence or be observed by external systems, agents, or principals. Examples: filesystems, databases, network endpoints, MCP servers, shared memory, hardware devices. |
 | **Environment-Modifying Operation (EMO)** | Any operation that modifies or retrieves Environment State. This includes both reads and writes. |
-| **Capability Manifest** | A machine-readable declaration of capability requirements needed for an agent to operate. Capability requirement IDs are manifest-local references, not authorization grants or MCP client wiring. |
+| **Capability Manifest** | A machine-readable declaration of intended agent capabilities. Capability IDs are manifest-local references, not authorization grants, provisioning requests, or MCP client wiring. |
 
 ---
 
@@ -273,55 +272,49 @@ Minimal structure:
 ```json
 {
   "id": "org:example/agent:researcher-v1",
-  "required_capabilities": []
+  "capabilities": []
 }
 ```
 
-### 8.2 Required Capabilities
+### 8.2 Capabilities
 
-The field `required_capabilities` is REQUIRED.
+The field `capabilities` is REQUIRED.
 
 Each entry MUST include:
 
-- `id` — a manifest-local identifier for the declared capability requirement.
-- `description` — a human-readable description of what the agent needs.
+- `id` — a manifest-local identifier for the declared agent capability.
+- `description` — a human-readable description of what the agent is designed to do.
 
 Example:
 
 ```json
 {
-  "required_capabilities": [
+  "capabilities": [
     {
-      "id": "workspace_files",
-      "description": "Inspect and modify files in the active workspace."
+      "id": "files_editing",
+      "description": "Can inspect and modify files in a project workspace."
     },
     {
       "id": "version_control",
-      "description": "Inspect repository state and create local commits."
+      "description": "Can inspect repository state and prepare local commits."
     }
   ]
 }
 ```
 
-Capability requirement IDs are local references within a single manifest. GPARS v0.1 does not assign global semantics to these IDs, does not define a universal capability ontology, and does not require Action Planes to infer concrete MCP tools from them. They exist so Agent Runtimes, Action Planes, user interfaces, deployment configuration, and audit logs can refer to the same declared requirement.
+Capability IDs are local references within a single manifest. GPARS v0.1 does not assign global semantics to these IDs, does not define a universal capability ontology, and does not require Action Planes to infer concrete MCP tools from them. They exist so Agent Runtimes, Action Planes, user interfaces, deployment configuration, and audit logs can refer to the same declared agent behavior.
 
-All declared capabilities in this field are mandatory for the agent to function as intended. The manifest is declarative — it describes what the agent needs, not a precondition for starting the agent loop and not an authorization grant. Concrete MCP client wiring, MCP server selection, tool exposure, and policy enforcement are controlled outside the manifest by Agent Runtime configuration and the Action Plane.
+Capability declarations describe the agent's intended classes of behavior. They do not describe what the environment must provide, they are not a precondition for starting the agent loop, and they are not authorization grants. Concrete MCP client wiring, MCP server selection, tool exposure, and policy enforcement are controlled outside the manifest by Agent Runtime configuration and the Action Plane.
 
-### 8.3 Optional Capabilities
-
-The field `optional_capabilities` is OPTIONAL.
-
-Optional capabilities follow the same schema as required capabilities. If an optional capability is unavailable or denied, the agent MAY continue operating without it. Degradation behavior for missing optional capabilities is implementation-defined.
-
-### 8.4 Identity Field
+### 8.3 Identity Field
 
 The `id` field is REQUIRED. It MUST uniquely identify the agent within its operational domain.
 
 The format, issuance mechanism, and verification model are implementation-defined in v0.1.
 
-### 8.5 Capability Descriptions
+### 8.4 Capability Descriptions
 
-Capability descriptions in v0.1 are **human-readable and non-authoritative**. They help users, Agent Runtimes, and Action Plane components understand why the agent requests a capability, but they do not define permissions and MUST NOT be treated as authorization grants.
+Capability descriptions in v0.1 are **human-readable and non-authoritative**. They help users, Agent Runtimes, and Action Plane components understand what the agent is designed to do, but they do not define permissions and MUST NOT be treated as authorization grants.
 
 Whether the agent is actually permitted to exercise any operation is determined by the user's security policy on the Action Plane (see [Section 9](#9-security-policy)).
 
@@ -418,7 +411,7 @@ The agent MAY retry after receiving `SERVER_UNAVAILABLE`, as the server may beco
 7. If the target MCP server is unavailable, the enforcement point returns `SERVER_UNAVAILABLE`. The agent MAY retry, wait, or adapt its approach.
 8. If the request is permitted and the server is available, the enforcement point forwards the request. The MCP server processes it and returns a result or an operational error (e.g., invalid parameters, resource not found).
 
-The manifest is a declarative statement of what the agent needs — not an activation gate. The Agent Runtime validates the manifest, while concrete MCP client wiring is provided by runtime or deployment configuration outside the manifest. Concrete MCP server binding, policy enforcement, and availability are controlled at the Action Plane boundary. MCP servers handle operational concerns; the enforcement point handles security concerns.
+The manifest is a declarative statement of what the agent is designed to do — not an activation gate or provisioning request. The Agent Runtime validates the manifest, while concrete MCP client wiring is provided by runtime or deployment configuration outside the manifest. Concrete MCP server binding, policy enforcement, and availability are controlled at the Action Plane boundary. MCP servers handle operational concerns; the enforcement point handles security concerns.
 
 ---
 
@@ -431,7 +424,7 @@ The manifest and the security policy serve different roles:
 | **Capability Requirements** | Agent developer | Manifest (Cognitive Plane) | Declarative (informational) |
 | **Security Policy** | User | Action Plane | Continuously during operation |
 
-The manifest declares what the agent needs. The security policy determines what the agent is allowed to do. These are independent — an agent may declare a `workspace_files` requirement described as file inspection and modification, but the user's policy may only permit reads on specific paths.
+The manifest declares what the agent is designed to do. The security policy determines what the agent is allowed to do. These are independent — an agent may declare a `files_editing` capability described as file inspection and modification, but the user's policy may only permit reads on specific paths.
 
 Enforcement points:
 - **Boundary** — the plane boundary enforcement point verifies agent identity, evaluates requests against the security policy, and routes permitted requests to MCP servers. The agent cannot bypass this point. Unauthorized operations receive `AUTHORIZATION_DENIED`. Unavailable servers return `SERVER_UNAVAILABLE`.
@@ -448,7 +441,7 @@ The agent is never trusted to enforce its own boundaries or assert its own ident
 | Level | Criteria |
 |-------|----------|
 | **Compliant** | Agent fully externalizes all EMOs via MCP and publishes a valid capability manifest. |
-| **Non-Compliant** | Agent performs EMOs internally or does not declare required capabilities. |
+| **Non-Compliant** | Agent performs EMOs internally or does not publish a valid capability manifest. |
 
 **Action Plane (Infrastructure) compliance:**
 
@@ -488,7 +481,7 @@ Partial or transitional compliance levels are not defined in v0.1 and are reserv
 
 - **Separation of Cognition and Action:** Prevents cognitive bias induced by embedded execution tools. When tools are internal, the agent's reasoning is shaped by their implementation. Externalization ensures the agent reasons about *what* to do, not *how* tools work.
 - **User-Owned Security:** The user owns the data and systems the agent operates on. The user — not the agent, not the agent developer — defines what is permitted. This mirrors established security models in operating systems, cloud platforms, and enterprise infrastructure.
-- **Declarative Environment Requirements:** Ensures deterministic agent behavior and runtime portability without binding the agent to specific MCP server implementations. An agent's manifest describes what it needs to function using manifest-local capability references and human-readable descriptions.
+- **Declarative Agent Capabilities:** Improves transparency and runtime portability without binding the agent to specific MCP server implementations. An agent's manifest describes its intended behavior using manifest-local capability references and human-readable descriptions.
 - **Discovery-Based Authorization:** Agents are not told their effective permissions. They discover boundaries by receiving denials. This prevents agents from gaming policy boundaries and keeps the security model simple.
 - **Modularity:** Enables emergent behavior across heterogeneous MCP capability ecosystems. Different cognitive models, reasoning architectures, and vendors can be composed without rewriting tool logic.
 - **General-Purpose Validity:** A truly general-purpose agent operates across environments without presuming intrinsic capabilities. Specialization comes from the agent loop — not from embedded tools.
@@ -539,18 +532,18 @@ A coding assistant agent declares the following manifest:
 {
   "id": "org:example/agent:coding-assistant-v1",
   "version": "0.1.0",
-  "required_capabilities": [
+  "capabilities": [
     {
-      "id": "workspace_files",
-      "description": "Inspect and modify files in the active workspace."
+      "id": "files_editing",
+      "description": "Can inspect and modify files in a project workspace."
     },
     {
       "id": "command_execution",
-      "description": "Run local commands needed for builds, tests, and development tasks."
+      "description": "Can run local commands for builds, tests, and development tasks."
     },
     {
       "id": "version_control",
-      "description": "Inspect repository state and create local commits."
+      "description": "Can inspect repository state and prepare local commits."
     }
   ]
 }
@@ -560,7 +553,7 @@ A coding assistant agent declares the following manifest:
 
 1. The Agent Runtime receives the manifest and validates its structure.
 2. The Agent Runtime validates the manifest-local capability references.
-3. Runtime configuration and the Action Plane bind those requirements to concrete MCP clients and servers according to local configuration and policy.
+3. Runtime configuration and the Action Plane may use those declarations for local binding, user review, and audit.
 4. The agent loop begins. No MCP server availability check is required.
 
 ### A.3 Successful Operation

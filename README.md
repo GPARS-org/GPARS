@@ -18,7 +18,7 @@ GPARS defines a mandatory separation between cognitive reasoning and environment
 
 ## Why general-purpose?
 
-Agents that embed their tools are special-purpose — their capability surface is fixed at development time. GPARS externalizes all actions via MCP, making the capability surface composable. The same cognitive core can be a coding assistant, a research agent, or a system administrator depending on which MCP servers are available. Specialization comes from the agent loop (system prompts, skills, reasoning) — not from embedded tools.
+Agents that embed their tools are special-purpose — their tool surface is fixed at development time. GPARS externalizes all actions via MCP, making the tool surface composable. The same cognitive core can be a coding assistant, a research agent, or a system administrator depending on which MCP servers are available. Specialization comes from the agent loop (system prompts, skills, reasoning) — not from embedded tools.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ Agents that embed their tools are special-purpose — their capability surface i
 
 - **Cognitive / Action separation** — agents reason internally but act exclusively through MCP servers
 - **User-owned security** — the user controls the Action Plane and defines what agents are permitted to do
-- **Declarative manifests** — agents declare capability requirements, not authorization grants
+- **Declarative manifests** — agents declare intended capabilities, not authorization grants
 - **Discovery-based authorization** — agents discover permission boundaries by receiving denials, like OS processes
 
 ## Documentation
